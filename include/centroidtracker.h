@@ -17,7 +17,7 @@ public:
 
     void register_Object(double centroid);
 
-    void deregister_Object(double centroid);
+    void deregister_Object(int objectID);
 
     void update(std::vector<std::vector<int>> boxes);
 
