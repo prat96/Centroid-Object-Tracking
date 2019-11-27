@@ -4,6 +4,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/core/utils/trace.hpp>
+
 using namespace cv;
 using namespace std;
 
@@ -27,33 +28,31 @@ int main() {
     while (true) {
         Mat cameraFrame;
         cap.read(cameraFrame);
-        imshow("cam", cameraFrame);
 
         Mat resized_camFrame;
-        resize(cameraFrame, resized_camFrame, Size(300,300));
-        auto inputBlob = dnn::blobFromImage(resized_camFrame, 1.0, Size(W, W),Scalar(104.0, 177.0, 123.0) );
+        resize(cameraFrame, resized_camFrame, Size(300, 300));
+        auto inputBlob = dnn::blobFromImage(resized_camFrame, 1.0, Size(W, W), Scalar(104.0, 177.0, 123.0));
 
         net.setInput(inputBlob);
         auto detection = net.forward("detection_out");
         Mat detectionMat(detection.size[2], detection.size[3], CV_32F, detection.ptr<float>());
 
         float confidenceThreshold = 0.2;
-        for (int i = 0; i < detectionMat.rows; i++)
-        {
+        for (int i = 0; i < detectionMat.rows; i++) {
             float confidence = detectionMat.at<float>(i, 2);
 
-            if (confidence > confidenceThreshold)
-            {
-                int xLeftBottom = static_cast<int>(detectionMat.at<float>(i, 3) * cameraFrame.cols);
-                int yLeftBottom = static_cast<int>(detectionMat.at<float>(i, 4) * cameraFrame.rows);
-                int xRightTop = static_cast<int>(detectionMat.at<float>(i, 5) * cameraFrame.cols);
-                int yRightTop = static_cast<int>(detectionMat.at<float>(i, 6) * cameraFrame.rows);
+            if (confidence > confidenceThreshold) {
+                int xLeftTop = static_cast<int>(detectionMat.at<float>(i, 3) * cameraFrame.cols);
+                int yLeftTop = static_cast<int>(detectionMat.at<float>(i, 4) * cameraFrame.rows);
+                int xRightBottom = static_cast<int>(detectionMat.at<float>(i, 5) * cameraFrame.cols);
+                int yRightBottom = static_cast<int>(detectionMat.at<float>(i, 6) * cameraFrame.rows);
 
-                Rect object((int)xLeftBottom, (int)yLeftBottom,
-                            (int)(xRightTop - xLeftBottom),
-                            (int)(yRightTop - yLeftBottom));
+                Rect object((int) xLeftTop, (int) yLeftTop, (int) (xRightBottom - xLeftTop),
+                            (int) (yRightBottom - yLeftTop));
 
                 rectangle(cameraFrame, object, Scalar(0, 255, 0), 2);
+//                cv::circle(cameraFrame, Point(xLeftTop, yLeftTop), 4, Scalar(255, 0, 0), -1);
+//                cv::circle(cameraFrame, Point(xRightBottom, yRightBottom), 4, Scalar(255, 255, 0), -1);
 
             }
         }
