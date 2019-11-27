@@ -22,8 +22,11 @@ public:
     void update(std::vector<std::vector<int>> boxes);
 
 private:
-    int maxDisappeared;  // Can be accessed via the setter/getter
+    int maxDisappeared;
     int nextObjectID;
+
+    // <ID, centroid>
     std::map<int, std::pair<int, int>> objects;
-    std::map<int, std::pair<int, int>> disappeared;
+    // <ID, count>
+    std::map<int, int> disappeared;
 };
