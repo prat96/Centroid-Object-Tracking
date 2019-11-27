@@ -4,8 +4,12 @@ Created by pratheek on 2019-11-27.
 #include "centroidtracker.h"
 
 CentroidTracker::CentroidTracker(int maxDisappeared) {
-    this->maxDisappeared = maxDisappeared;
     this->nextObjectID = 0;
+
+    // ordered dict "objects"
+    // ordered dict "disappeared"
+
+    this->maxDisappeared = maxDisappeared;
 }
 
 

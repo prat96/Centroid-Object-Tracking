@@ -7,6 +7,7 @@ Created by pratheek on 2019-11-27.
 
 #endif //C___CENTROIDTRACKER_H
 
+#include <iostream>
 
 class CentroidTracker {
 public:
