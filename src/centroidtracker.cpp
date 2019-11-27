@@ -49,13 +49,30 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
 
     // initialize an array of input centroids for the current frame
     vector<vector<int>> inputCentroids;
-    for (auto i : boxes){
-        inputCentroids.insert(inputCentroids.end(), {0,0});
+    inputCentroids.clear();
+//    for (auto i : boxes){
+//        inputCentroids.insert(inputCentroids.end(), {0,0});
 //        cout << inputCentroids.front().size() << endl;
-    }
+//    }
 
     // loop over the bounding box rectangles
+//    for (auto it1 = boxes.begin(); it1 != boxes.end(); ++it1){
+//
+//    }
 
+    for (auto i : boxes) {
+//        cout << i[0] << endl;
+        int cX = int(i[0] + i[2] / 2.0);
+        int cY = int(i[1] + i[3] / 2.0);
+//        cout << cX << " " << cY << endl;
+        inputCentroids.insert(inputCentroids.end(), {cX, cY});
+    }
+    cout << "SIZE = " << inputCentroids.size() << endl;
+
+    //if we are currently not tracking any objects take the input centroids and register each of them
+    if (!this->objects.empty()) {
+
+    }
 
     return this->objects;
 }
