@@ -37,6 +37,8 @@ int main() {
         auto detection = net.forward("detection_out");
         Mat detectionMat(detection.size[2], detection.size[3], CV_32F, detection.ptr<float>());
 
+        vector<vector<int>> boxes;
+
         float confidenceThreshold = 0.2;
         for (int i = 0; i < detectionMat.rows; i++) {
             float confidence = detectionMat.at<float>(i, 2);
@@ -49,13 +51,18 @@ int main() {
 
                 Rect object((int) xLeftTop, (int) yLeftTop, (int) (xRightBottom - xLeftTop),
                             (int) (yRightBottom - yLeftTop));
-
                 rectangle(cameraFrame, object, Scalar(0, 255, 0), 2);
-//                cv::circle(cameraFrame, Point(xLeftTop, yLeftTop), 4, Scalar(255, 0, 0), -1);
+
+                boxes.insert(boxes.end(), {xLeftTop, yLeftTop, xRightBottom, yRightBottom});
+
+//                cv::circle(cameraFrame, Point(boxes[0][0], boxes[0][1]), 4, Scalar(255, 0, 0), -1);
 //                cv::circle(cameraFrame, Point(xRightBottom, yRightBottom), 4, Scalar(255, 255, 0), -1);
 
             }
         }
+//        if (!boxes.empty()) {
+//            cout << boxes[0].at(3) << " " << boxes.size() << endl;
+//        }
         imshow("Detection", cameraFrame);
 
         if (waitKey(30) >= 0)
