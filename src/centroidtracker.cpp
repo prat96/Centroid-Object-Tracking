@@ -3,6 +3,8 @@ Created by pratheek on 2019-11-27.
 */
 #include "centroidtracker.h"
 
+using namespace std;
+
 CentroidTracker::CentroidTracker(int maxDisappeared) {
     this->nextObjectID = 0;
 
@@ -22,7 +24,12 @@ void CentroidTracker::deregister_Object(double centroid) {
 }
 
 void CentroidTracker::update(vector<vector<int>> boxes) {
+    // checking
     if (!boxes.empty()) {
         cout << boxes[0].at(0) << " " << boxes.size() << endl;
+    }
+
+    if(boxes.empty()){
+        cout << "NO BOXES BROOOO" << endl;
     }
 }

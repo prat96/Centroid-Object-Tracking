@@ -9,24 +9,21 @@ Created by pratheek on 2019-11-27.
 
 #include <iostream>
 #include <vector>
-
-using namespace std;
+#include <map>
 
 class CentroidTracker {
 public:
-    CentroidTracker(int maxDisappeared);
+    explicit CentroidTracker(int maxDisappeared);
 
     void register_Object(double centroid);
 
     void deregister_Object(double centroid);
-    
-    void update(vector<vector<int>> boxes);
 
-    int getArg1();
-
-    void setArg1(int arg1);
+    void update(std::vector<std::vector<int>> boxes);
 
 private:
     int maxDisappeared;  // Can be accessed via the setter/getter
     int nextObjectID;
+    std::map<int, std::pair<int, int>> objects;
+    std::map<int, std::pair<int, int>> disappeared;
 };
