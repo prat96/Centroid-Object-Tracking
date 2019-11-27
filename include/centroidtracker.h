@@ -8,6 +8,9 @@ Created by pratheek on 2019-11-27.
 #endif //C___CENTROIDTRACKER_H
 
 #include <iostream>
+#include <vector>
+
+using namespace std;
 
 class CentroidTracker {
 public:
@@ -16,6 +19,8 @@ public:
     void register_Object(double centroid);
 
     void deregister_Object(double centroid);
+    
+    void update(vector<vector<int>> boxes);
 
     int getArg1();
 

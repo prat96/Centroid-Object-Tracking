@@ -20,3 +20,9 @@ void CentroidTracker::register_Object(double centroid) {
 void CentroidTracker::deregister_Object(double centroid) {
 
 }
+
+void CentroidTracker::update(vector<vector<int>> boxes) {
+    if (!boxes.empty()) {
+        cout << boxes[0].at(0) << " " << boxes.size() << endl;
+    }
+}
