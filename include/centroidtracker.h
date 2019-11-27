@@ -19,7 +19,7 @@ public:
 
     void deregister_Object(int objectID);
 
-    void update(std::vector<std::vector<int>> boxes);
+    std::map<int, std::pair<int, int>> update(std::vector<std::vector<int>> boxes);
 
 private:
     int maxDisappeared;

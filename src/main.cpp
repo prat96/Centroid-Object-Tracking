@@ -59,7 +59,7 @@ int main() {
             }
         }
 
-        centroidTracker->update(boxes);        
+        auto objects = centroidTracker->update(boxes);
 
         imshow("Detection", cameraFrame);
 

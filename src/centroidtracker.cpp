@@ -28,7 +28,7 @@ void CentroidTracker::deregister_Object(int objectID) {
     this->disappeared.erase(objectID);
 }
 
-void CentroidTracker::update(vector<vector<int>> boxes) {
+std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> boxes) {
     // checking
 //    if (!boxes.empty()) {
 //        cout << boxes[0].at(0) << " " << boxes.size() << endl;
@@ -44,5 +44,18 @@ void CentroidTracker::update(vector<vector<int>> boxes) {
                 this->deregister_Object(i.first);
             }
         }
+        return this->objects;
     }
+
+    // initialize an array of input centroids for the current frame
+    vector<vector<int>> inputCentroids;
+    for (auto i : boxes){
+        inputCentroids.insert(inputCentroids.end(), {0,0});
+//        cout << inputCentroids.front().size() << endl;
+    }
+
+    // loop over the bounding box rectangles
+
+
+    return this->objects;
 }
