@@ -10,15 +10,17 @@ Created by pratheek on 2019-11-27.
 
 class CentroidTracker {
 public:
-    CentroidTracker(int arg1, bool arg2 = true);
+    CentroidTracker(int maxDisappeared);
 
-    int myFunc(int arg3);
+    void register_Object(double centroid);
+
+    void deregister_Object(double centroid);
 
     int getArg1();
 
     void setArg1(int arg1);
 
 private:
-    int arg1;  // Can be accessed via the setter/getter
-    bool arg2; // Cannot be accessed outside of the class
+    int maxDisappeared;  // Can be accessed via the setter/getter
+    int nextObjectID;
 };

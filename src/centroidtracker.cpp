@@ -1,22 +1,18 @@
 /*
 Created by pratheek on 2019-11-27.
 */
+#include "centroidtracker.h"
 
-CentroidTracker::CentroidTracker(int arg1, bool arg2 = true) {
-    this.arg1 = arg1;
-    this.arg2 = arg2;
+CentroidTracker::CentroidTracker(int maxDisappeared) {
+    this->maxDisappeared = maxDisappeared;
+    this->nextObjectID = 0;
 }
 
-int CentroidTracker::myFunc (int arg3) {
-    return arg3;
+
+void CentroidTracker::register_Object(double centroid) {
+
 }
 
-// Getter
-int CentroidTracker::getArg1 () {
-    return this.arg1;
-}
+void CentroidTracker::deregister_Object(double centroid) {
 
-// Setter
-void CentroidTracker::setArg1 (int arg1) {
-    this.arg1 = arg1;
 }
