@@ -14,6 +14,13 @@ CentroidTracker::CentroidTracker(int maxDisappeared) {
     this->maxDisappeared = maxDisappeared;
 }
 
+double CentroidTracker::distanceCalculate(double x1, double y1, double x2, double y2) {
+    double x = x1 - x2; //calculating number to square in next step
+    double y = y1 - y2;
+    double dist = sqrt((x * x) + (y * y));       //calculating Euclidean distance
+
+    return dist;
+}
 
 void CentroidTracker::register_Object(int cX, int cY) {
 //    cout << "Centroids: " << cX << " " << cY << endl;
@@ -22,15 +29,15 @@ void CentroidTracker::register_Object(int cX, int cY) {
     this->disappeared.insert(disappeared.end(), {object_ID, 0});
     this->nextObjectID += 1;
 
-    for(auto elem : this->objects)
-    {
-        std::cout << "CHECKING OBJECTS: " << elem.first << " " << elem.second.first << " " << elem.second.second << "\n";
+    for (auto elem : this->objects) {
+        std::cout << "CHECKING OBJECTS: " << elem.first << " " << elem.second.first << " " << elem.second.second
+                  << "\n";
     }
 }
 
 void CentroidTracker::deregister_Object(int objectID) {
     cout << "Deregistered object: " << objectID << endl;
-    if (!this->objects.empty()){
+    if (!this->objects.empty()) {
         this->objects.erase(objectID);
         this->disappeared.erase(objectID);
     }
@@ -39,15 +46,14 @@ void CentroidTracker::deregister_Object(int objectID) {
 std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> boxes) {
 
     if (boxes.empty()) {
-//        cout << "NO BOXES BROOOO" << endl;
-
+        // cout << "NO BOXES BROOOO" << endl;
         if (!disappeared.empty()) {
-            for(auto elem : this->disappeared)
-            {
-//                std::cout << "CHECKING DISAPPEARED: " << elem.first << " " << elem.second << " " << disappeared.size() << endl;
-                disappeared[elem.first] ++;
+            for (auto elem : this->disappeared) {
+                std::cout << "CHECKING DISAPPEARED: " << elem.first << " " << elem.second << " " << disappeared.size()
+                          << endl;
+                disappeared[elem.first]++;
 
-                if (elem.second > this->maxDisappeared){
+                if (elem.second > this->maxDisappeared) {
                     this->deregister_Object(elem.first);
                 }
             }
@@ -56,12 +62,12 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
     }
     // initialize an array of input centroids for the current frame
     vector<vector<int>> inputCentroids;
-    inputCentroids.clear();
-//    for (auto i : boxes){
-//        inputCentroids.insert(inputCentroids.end(), {0,0});
-//        cout << inputCentroids.front().size() << endl;
-//    }
-
+    vector<vector<int>> objectCentroids;
+/*    for (auto i : boxes){
+          inputCentroids.insert(inputCentroids.end(), {0,0});
+          cout << inputCentroids.front().size() << endl;
+    }
+*/
     // loop over the bounding box rectangles
     for (auto i : boxes) {
         // use the bounding box coordinates to derive the centroid
@@ -69,7 +75,6 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         int cY = int((i[1] + i[3]) / 2.0);
         inputCentroids.insert(inputCentroids.end(), {cX, cY});
     }
-//    cout << "SIZE = " << inputCentroids.size() << endl;
 
     //if we are currently not tracking any objects take the input centroids and register each of them
     if (this->objects.empty()) {
@@ -78,10 +83,16 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         }
     }
 
-//    for(auto elem : objects)
-//    {
-//        std::cout << "CHECKING OBJECTS: " << elem.first << " " << elem.second.first << " " << elem.second.second << "\n";
-//    }
+    // otherwise, there are currently tracking objects so we need to try to match the
+    // input centroids to existing object centroids
+    else {
+        for (auto elem : this->objects){
+            cout << "objIDS: " << elem.first << endl;
+            cout << "objCnt: " << elem.second.first << " " << elem.second.second << endl;
+
+//            double dist = distanceCalculate(elem.second.first, elem.second.second)
+        }
+    }
 
     return this->objects;
 }

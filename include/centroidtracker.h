@@ -10,6 +10,7 @@ Created by pratheek on 2019-11-27.
 #include <iostream>
 #include <vector>
 #include <map>
+#include<math.h>
 
 class CentroidTracker {
 public:
@@ -24,6 +25,8 @@ public:
 private:
     int maxDisappeared;
     int nextObjectID;
+
+    static double distanceCalculate(double x1, double y1, double x2, double y2);
 
     // <ID, centroid>
     std::map<int, std::pair<int, int>> objects;
