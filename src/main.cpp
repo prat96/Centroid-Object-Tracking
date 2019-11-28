@@ -10,7 +10,7 @@ using namespace std;
 int main() {
     std::cout << "Hello, Tracker!" << std::endl;
     int W = 300;
-    auto centroidTracker = new CentroidTracker(50);
+    auto centroidTracker = new CentroidTracker(40);
 
     VideoCapture cap(0);
     if (!cap.isOpened()) {

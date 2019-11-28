@@ -29,26 +29,22 @@ void CentroidTracker::register_Object(int cX, int cY) {
 }
 
 void CentroidTracker::deregister_Object(int objectID) {
+    cout << "Deregistered object: " << objectID << endl;
     if (!this->objects.empty()){
-//        cout << "REACHED DEREGISTER" << endl;
         this->objects.erase(objectID);
         this->disappeared.erase(objectID);
     }
 }
 
 std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> boxes) {
-    // checking
-//    if (!boxes.empty()) {
-//        cout << boxes[0].at(0) << " " << boxes.size() << endl;
-//    }
 
     if (boxes.empty()) {
-        cout << "NO BOXES BROOOO" << endl;
+//        cout << "NO BOXES BROOOO" << endl;
 
         if (!disappeared.empty()) {
             for(auto elem : this->disappeared)
             {
-                std::cout << "CHECKING DISAPPEARED: " << elem.first << " " << elem.second << " " << disappeared.size() << endl;
+//                std::cout << "CHECKING DISAPPEARED: " << elem.first << " " << elem.second << " " << disappeared.size() << endl;
                 disappeared[elem.first] ++;
 
                 if (elem.second > this->maxDisappeared){
