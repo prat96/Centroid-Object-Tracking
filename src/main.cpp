@@ -53,7 +53,11 @@ int main() {
                 rectangle(cameraFrame, object, Scalar(0, 255, 0), 2);
 
                 boxes.insert(boxes.end(), {xLeftTop, yLeftTop, xRightBottom, yRightBottom});
-//                cv::circle(cameraFrame, Point(boxes[0][0], boxes[0][1]), 4, Scalar(255, 0, 0), -1);
+
+//                int cX = int((xLeftTop + xRightBottom) / 2.0);
+//                int cY = int((yLeftTop + yRightBottom) / 2.0);
+//                cout << "CENTROID CHECK: " << cX << " " << cY << endl;
+//                cv::circle(cameraFrame, Point(cX, cY), 4, Scalar(255, 0, 0), -1);
 //                cv::circle(cameraFrame, Point(xRightBottom, yRightBottom), 4, Scalar(255, 255, 0), -1);
 
             }

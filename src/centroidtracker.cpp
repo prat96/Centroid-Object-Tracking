@@ -9,23 +9,31 @@ CentroidTracker::CentroidTracker(int maxDisappeared) {
     this->nextObjectID = 0;
 
     // ordered dicts "objects" and "disappeared"
-    this->objects;
-    this->disappeared;
-//    disappeared.insert(pair<int, int>(5, 4));
+    //    disappeared.insert(pair<int, int>(5, 4));
 
     this->maxDisappeared = maxDisappeared;
 }
 
 
 void CentroidTracker::register_Object(int cX, int cY) {
-//    this->objects.insert(objects.end(), {this->nextObjectID, centroid});
+//    cout << "Centroids: " << cX << " " << cY << endl;
+    int object_ID = this->nextObjectID;
+    this->objects.insert(objects.end(), {object_ID, {cX, cY}});
+    this->disappeared.insert(disappeared.end(), {object_ID, 0});
+    this->nextObjectID += 1;
+
+    for(auto elem : this->objects)
+    {
+        std::cout << "CHECKING OBJECTS: " << elem.first << " " << elem.second.first << " " << elem.second.second << "\n";
+    }
 }
 
 void CentroidTracker::deregister_Object(int objectID) {
-    cout << "REACHED DEREGISTER" << endl;
-
-    this->objects.erase(objectID);
-    this->disappeared.erase(objectID);
+    if (!this->objects.empty()){
+//        cout << "REACHED DEREGISTER" << endl;
+        this->objects.erase(objectID);
+        this->disappeared.erase(objectID);
+    }
 }
 
 std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> boxes) {
@@ -37,16 +45,19 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
     if (boxes.empty()) {
         cout << "NO BOXES BROOOO" << endl;
 
-        for (auto i : disappeared) {
-            this->disappeared[i.second] += 1;
+        if (!disappeared.empty()) {
+            for(auto elem : this->disappeared)
+            {
+                std::cout << "CHECKING DISAPPEARED: " << elem.first << " " << elem.second << " " << disappeared.size() << endl;
+                disappeared[elem.first] ++;
 
-            if (this->disappeared[i.second] > this->maxDisappeared) {
-                this->deregister_Object(i.first);
+                if (elem.second > this->maxDisappeared){
+                    this->deregister_Object(elem.first);
+                }
             }
         }
         return this->objects;
     }
-
     // initialize an array of input centroids for the current frame
     vector<vector<int>> inputCentroids;
     inputCentroids.clear();
@@ -56,23 +67,25 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
 //    }
 
     // loop over the bounding box rectangles
-//    for (auto it1 = boxes.begin(); it1 != boxes.end(); ++it1){
-//
-//    }
-
     for (auto i : boxes) {
-//        cout << i[0] << endl;
-        int cX = int(i[0] + i[2] / 2.0);
-        int cY = int(i[1] + i[3] / 2.0);
-//        cout << cX << " " << cY << endl;
+        // use the bounding box coordinates to derive the centroid
+        int cX = int((i[0] + i[2]) / 2.0);
+        int cY = int((i[1] + i[3]) / 2.0);
         inputCentroids.insert(inputCentroids.end(), {cX, cY});
     }
-    cout << "SIZE = " << inputCentroids.size() << endl;
+//    cout << "SIZE = " << inputCentroids.size() << endl;
 
     //if we are currently not tracking any objects take the input centroids and register each of them
-    if (!this->objects.empty()) {
-
+    if (this->objects.empty()) {
+        for (auto &row:inputCentroids) {
+            this->register_Object(row[0], row[1]);
+        }
     }
+
+//    for(auto elem : objects)
+//    {
+//        std::cout << "CHECKING OBJECTS: " << elem.first << " " << elem.second.first << " " << elem.second.second << "\n";
+//    }
 
     return this->objects;
 }
