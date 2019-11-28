@@ -69,12 +69,6 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         k++;
     }
 
-//    check inpcentroids
-//    for (auto inp: inputCentroids) {
-//        cout << inp.first << " " << inp.second[0] << " " << inp.second[1] << endl;
-//    }
-
-//    cout << "IC SIZE: " << inputCentroids.size() << endl;
 
 //if we are currently not tracking any objects take the input centroids and register each of them
     if (this->objects.empty()) {
@@ -83,38 +77,40 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         }
     }
 
-//    cout << "OBJ SIZE: " << this->objects.size() << endl;
 // otherwise, there are currently tracking objects so we need to try to match the
 // input centroids to existing object centroids
 
 // grab the set of object IDs and corresponding centroids
-    vector<int> objectIDs;
-    vector<vector<int>> objectCentroids;
-    for (auto &object : this->objects) {
-        objectIDs.push_back(object.first);
-        objectCentroids.push_back({object.second.first, object.second.second});
-    }
+    else {
+        vector<int> objectIDs;
+        vector<vector<int>> objectCentroids;
+        for (auto &object : this->objects) {
+            objectIDs.push_back(object.first);
+            objectCentroids.push_back({object.second.first, object.second.second});
+        }
 
-    std::map<float, int> Distances;
+        std::map<float, int> Distances;
 
-    for (vector<vector<int>>::size_type i = 0; i < objectCentroids.size(); i++) {
-        for (vector<vector<int>>::size_type j = 0; j < inputCentroids.size(); j++) {
-            double dist = calcDistance(objectCentroids[i][0], objectCentroids[i][1], inputCentroids[i][0],
-                                       inputCentroids[i][1]);
-//            cout << dist << endl;
-            Distances.insert({dist, i});
+        for (vector<vector<int>>::size_type i = 0; i < objectCentroids.size(); i++) {
+            for (vector<vector<int>>::size_type j = 0; j < inputCentroids.size(); j++) {
+                double dist = calcDistance(objectCentroids[i][0], objectCentroids[i][1], inputCentroids[i][0],
+                                           inputCentroids[i][1]);
+                Distances.insert({dist, i});
+            }
+        }
+
+        std::set<double> used;
+        std::set<double> unused;
+
+        for (auto d : Distances) {
+            if (used.count(d.second)) { continue; }
+
+            int objectID = objectIDs[d.second];
+            this->objects.at(objectID) = {inputCentroids.at(objectID)[0], inputCentroids.at(objectID)[1]};
+            this->disappeared.at(objectID) = 0;
+
+            used.insert(objectID);
         }
     }
-
-    std::set<double> used;
-
-    for (auto d : Distances) {
-        if (used.count(d.second)) { continue; }
-
-        int objectID = objectIDs[d.second];
-//        cout << "objectID: " << objectID << endl;
-//        this->objects.at(objectID) =
-    }
-
     return this->objects;
 }
