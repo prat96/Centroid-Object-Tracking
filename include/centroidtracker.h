@@ -15,7 +15,7 @@ class CentroidTracker {
 public:
     explicit CentroidTracker(int maxDisappeared);
 
-    void register_Object(double centroid);
+    void register_Object(int cX, int cY);
 
     void deregister_Object(int objectID);
 

@@ -17,8 +17,8 @@ CentroidTracker::CentroidTracker(int maxDisappeared) {
 }
 
 
-void CentroidTracker::register_Object(double centroid) {
-
+void CentroidTracker::register_Object(int cX, int cY) {
+//    this->objects.insert(objects.end(), {this->nextObjectID, centroid});
 }
 
 void CentroidTracker::deregister_Object(int objectID) {
