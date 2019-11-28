@@ -1,6 +1,7 @@
 /*
 Created by pratheek on 2019-11-27.
 */
+#include <set>
 #include "centroidtracker.h"
 
 using namespace std;
@@ -21,8 +22,8 @@ double CentroidTracker::calcDistance(double x1, double y1, double x2, double y2)
 void CentroidTracker::register_Object(int cX, int cY) {
 //    cout << "Centroids: " << cX << " " << cY << endl;
     int object_ID = this->nextObjectID;
-    this->objects.insert(objects.end(), {object_ID, {cX, cY}});
-    this->disappeared.insert(disappeared.end(), {object_ID, 0});
+    this->objects.insert({object_ID, {cX, cY}});
+    this->disappeared.insert({object_ID, 0});
     this->nextObjectID += 1;
 
     for (auto elem : this->objects) {
@@ -42,7 +43,6 @@ void CentroidTracker::deregister_Object(int objectID) {
 std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> boxes) {
 
     if (boxes.empty()) {
-        // cout << "NO BOXES BROOOO" << endl;
         if (!disappeared.empty()) {
             for (auto elem : this->disappeared) {
                 std::cout << "CHECKING DISAPPEARED: " << elem.first << " " << elem.second << " " << disappeared.size()
@@ -56,42 +56,38 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         }
         return this->objects;
     }
+
     // initialize an array of input centroids for the current frame
-    vector<vector<int>> inputCentroids;
-/*    for (auto i : boxes){
-          inputCentroids.insert(inputCentroids.end(), {0,0});
-          cout << inputCentroids.front().size() << endl;
-    }
-*/
+    std::map<int, std::vector<int>> inputCentroids;
     // loop over the bounding box rectangles
-    for (auto i : boxes) {
+    int k = 0;
+    for (auto b : boxes) {
         // use the bounding box coordinates to derive the centroid
-        int cX = int((i[0] + i[2]) / 2.0);
-        int cY = int((i[1] + i[3]) / 2.0);
-        inputCentroids.insert(inputCentroids.end(), {cX, cY});
+        int cX = int((b[0] + b[2]) / 2.0);
+        int cY = int((b[1] + b[3]) / 2.0);
+        inputCentroids.insert(pair<int, vector<int>>({k, {cX, cY}}));
+        k++;
     }
+
+//    check inpcentroids
+//    for (auto inp: inputCentroids) {
+//        cout << inp.first << " " << inp.second[0] << " " << inp.second[1] << endl;
+//    }
 
 //    cout << "IC SIZE: " << inputCentroids.size() << endl;
 
-    //if we are currently not tracking any objects take the input centroids and register each of them
+//if we are currently not tracking any objects take the input centroids and register each of them
     if (this->objects.empty()) {
-        for (auto &row:inputCentroids) {
-//            cout << "ROW DATA: " << row.size() << endl;
-            this->register_Object(row[0], row[1]);
+        for (auto &inp: inputCentroids) {
+            this->register_Object(inp.second[0], inp.second[1]);
         }
     }
 
-/*    for (vector<vector<int>>::size_type i = 0; i < inputCentroids.size(); i++) {
-        cout << i << endl;
-        for (vector<int>::size_type j = 0; j < inputCentroids[i].size(); j++) {
-            cout << "J: " << j << " " << inputCentroids[i][j] << ' ';
-        }
-        cout << endl;
-    }
-*/
 //    cout << "OBJ SIZE: " << this->objects.size() << endl;
-    // otherwise, there are currently tracking objects so we need to try to match the
-    // input centroids to existing object centroids
+// otherwise, there are currently tracking objects so we need to try to match the
+// input centroids to existing object centroids
+
+// grab the set of object IDs and corresponding centroids
     vector<int> objectIDs;
     vector<vector<int>> objectCentroids;
     for (auto &object : this->objects) {
@@ -99,12 +95,25 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         objectCentroids.push_back({object.second.first, object.second.second});
     }
 
-    vector<double> D;
-    for (vector<vector<int>>::size_type i = 0; i < inputCentroids.size(); i++) {
-        double dist = calcDistance(inputCentroids[i][0], inputCentroids[i][1], objectCentroids[i][0],
-                                   objectCentroids[i][1]);
-        D.push_back(dist);
-        cout << "Distance: " << dist << endl;
+    std::map<float, int> Distances;
+
+    for (vector<vector<int>>::size_type i = 0; i < objectCentroids.size(); i++) {
+        for (vector<vector<int>>::size_type j = 0; j < inputCentroids.size(); j++) {
+            double dist = calcDistance(objectCentroids[i][0], objectCentroids[i][1], inputCentroids[i][0],
+                                       inputCentroids[i][1]);
+//            cout << dist << endl;
+            Distances.insert({dist, i});
+        }
+    }
+
+    std::set<double> used;
+
+    for (auto d : Distances) {
+        if (used.count(d.second)) { continue; }
+
+        int objectID = objectIDs[d.second];
+//        cout << "objectID: " << objectID << endl;
+//        this->objects.at(objectID) =
     }
 
     return this->objects;
