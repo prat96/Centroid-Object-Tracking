@@ -89,16 +89,33 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
             objectCentroids.push_back({object.second.first, object.second.second});
         }
 
-        std::map<float, int> Distances;
+        vector<map<float, int>> Distances;
+        vector<vector<float>> D;
 
-        for (vector<vector<int>>::size_type i = 0; i < objectCentroids.size(); i++) {
-            for (vector<vector<int>>::size_type j = 0; j < inputCentroids.size(); j++) {
-                double dist = calcDistance(objectCentroids[i][0], objectCentroids[i][1], inputCentroids[i][0],
-                                           inputCentroids[i][1]);
-                Distances.insert({dist, i});
+        for (vector<vector<int>>::size_type i = 0; i < objectCentroids.size(); ++i) {
+            vector<float> temp;
+            map<float, int> temp_map;
+            int kj = 0;
+            for (vector<vector<int>>::size_type j = 0; j < inputCentroids.size(); ++j) {
+                double dist = calcDistance(objectCentroids[i][0], objectCentroids[i][1], inputCentroids[j][0],
+                                           inputCentroids[j][1]);
+
+                temp_map.insert({dist, kj});
+                temp.push_back(dist);
+                ++kj;
+            }
+            D.push_back(temp);
+            Distances.push_back(temp_map);
+        }
+
+        for (auto i: Distances) {
+            cout << "SIZE: " << i.size() << " " << Distances.size()<< endl;
+            for (auto j: i){
+                cout << j.first << " " << j.second << endl;
             }
         }
 
+        /*
         std::set<double> used;
         std::set<double> unused;
 
@@ -110,7 +127,7 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
             this->disappeared.at(objectID) = 0;
 
             used.insert(objectID);
-        }
+        }*/
     }
     return this->objects;
 }

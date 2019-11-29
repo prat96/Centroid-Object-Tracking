@@ -10,7 +10,7 @@ Created by pratheek on 2019-11-27.
 #include <iostream>
 #include <vector>
 #include <map>
-#include<math.h>
+#include<cmath>
 
 class CentroidTracker {
 public:

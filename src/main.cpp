@@ -66,7 +66,7 @@ int main() {
         auto objects = centroidTracker->update(boxes);
 
         imshow("Detection", cameraFrame);
-
+//        waitKey(0);
         if (waitKey(30) >= 0)
             break;
     }
