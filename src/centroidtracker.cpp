@@ -2,6 +2,7 @@
 Created by pratheek on 2019-11-27.
 */
 #include <set>
+#include <algorithm>
 #include "centroidtracker.h"
 
 using namespace std;
@@ -75,6 +76,7 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         for (auto &inp: inputCentroids) {
             this->register_Object(inp.second[0], inp.second[1]);
         }
+//        this->objects.insert({14, {15, 68}});
     }
 
 // otherwise, there are currently tracking objects so we need to try to match the
@@ -95,30 +97,59 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         for (vector<vector<int>>::size_type i = 0; i < objectCentroids.size(); ++i) {
             vector<float> temp;
             map<float, int> temp_map;
-            int kj = 0;
             for (vector<vector<int>>::size_type j = 0; j < inputCentroids.size(); ++j) {
                 double dist = calcDistance(objectCentroids[i][0], objectCentroids[i][1], inputCentroids[j][0],
                                            inputCentroids[j][1]);
 
-                temp_map.insert({dist, kj});
+                temp_map.insert({dist, j});
                 temp.push_back(dist);
-                ++kj;
             }
             D.push_back(temp);
             Distances.push_back(temp_map);
         }
 
+        vector<int> rows;
+        vector<int> cols;
+
+//        for (auto i: Distances) {
+//            cout << "SIZE: " << i.size() << " " << Distances.size() << endl;
+//            for (auto j: i) {
+//                cout << j.first << " " << j.second << endl;
+//                rows.push_back(j.second);
+//            }
+//        }
+
+        struct vecRowSort {
+            bool operator()(const map<float, int> &first, const map<float, int> &second) const {
+                return first.begin()->first < second.begin()->first;
+            }
+        };
+
+        sort(Distances.begin(), Distances.end(), vecRowSort());
+        cout << "SORTED" << endl;
+
         for (auto i: Distances) {
-            cout << "SIZE: " << i.size() << " " << Distances.size()<< endl;
-            for (auto j: i){
-                cout << j.first << " " << j.second << endl;
+//            cout << "SIZE: " << i.size() << " " << Distances.size() << endl;
+            for (auto j: i) {
+//                cout << j.first << " " << j.second << endl;
+                rows.push_back(j.second);
+            }
+            for (auto r: rows) {
+                cout << "ROWS CHECK: " << r << endl;
+                cout << inputCentroids[r][0] << " " << inputCentroids[r][1] << endl;
             }
         }
 
-        /*
         std::set<double> used;
         std::set<double> unused;
 
+        for (auto r: rows) {
+            if (used.count(r)) { continue; }
+
+
+        }
+
+        /*
         for (auto d : Distances) {
             if (used.count(d.second)) { continue; }
 
@@ -129,5 +160,6 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
             used.insert(objectID);
         }*/
     }
+    cout << "<----------------------->" << "\n" << endl;
     return this->objects;
 }
