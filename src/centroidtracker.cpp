@@ -111,14 +111,6 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         vector<int> rows;
         vector<int> cols;
 
-//        for (auto i: Distances) {
-//            cout << "SIZE: " << i.size() << " " << Distances.size() << endl;
-//            for (auto j: i) {
-//                cout << j.first << " " << j.second << endl;
-//                rows.push_back(j.second);
-//            }
-//        }
-
         struct vecRowSort {
             bool operator()(const map<float, int> &first, const map<float, int> &second) const {
                 return first.begin()->first < second.begin()->first;
@@ -129,36 +121,32 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         cout << "SORTED" << endl;
 
         for (auto i: Distances) {
-//            cout << "SIZE: " << i.size() << " " << Distances.size() << endl;
             for (auto j: i) {
 //                cout << j.first << " " << j.second << endl;
                 rows.push_back(j.second);
             }
-            for (auto r: rows) {
-                cout << "ROWS CHECK: " << r << endl;
-                cout << inputCentroids[r][0] << " " << inputCentroids[r][1] << endl;
-            }
+//            for (auto r: rows) {
+//                cout << "ROWS CHECK: " << r << endl;
+//                cout << inputCentroids[r][0] << " " << inputCentroids[r][1] << endl;
+//            }
         }
 
-        std::set<double> used;
-        std::set<double> unused;
+        set<double> used;
+        set<double> unused;
 
         for (auto r: rows) {
             if (used.count(r)) { continue; }
 
-
-        }
-
-        /*
-        for (auto d : Distances) {
-            if (used.count(d.second)) { continue; }
-
-            int objectID = objectIDs[d.second];
-            this->objects.at(objectID) = {inputCentroids.at(objectID)[0], inputCentroids.at(objectID)[1]};
+            int objectID = objectIDs[r];
+            this->objects.at(objectID) = {inputCentroids[r][0], inputCentroids[r][1]};
             this->disappeared.at(objectID) = 0;
 
-            used.insert(objectID);
-        }*/
+            used.insert(r);
+        }
+
+        // compute indexes we have NOT examined yet
+        set_difference(rows.begin(), rows.end(), used.begin(), used.end(), inserter(unused, unused.end()));
+
     }
     cout << "<----------------------->" << "\n" << endl;
     return this->objects;
