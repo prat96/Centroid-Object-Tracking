@@ -22,14 +22,14 @@ public:
 
     std::map<int, std::pair<int, int>> update(std::vector<std::vector<int>> boxes);
 
+    // <ID, centroid>
+    std::map<int, std::pair<int, int>> objects;
 private:
     int maxDisappeared;
+
     int nextObjectID;
 
     static double calcDistance(double x1, double y1, double x2, double y2);
-
-    // <ID, centroid>
-    std::map<int, std::pair<int, int>> objects;
     // <ID, count>
     std::map<int, int> disappeared;
 };

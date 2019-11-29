@@ -21,16 +21,10 @@ double CentroidTracker::calcDistance(double x1, double y1, double x2, double y2)
 }
 
 void CentroidTracker::register_Object(int cX, int cY) {
-//    cout << "Centroids: " << cX << " " << cY << endl;
     int object_ID = this->nextObjectID;
     this->objects.insert({object_ID, {cX, cY}});
     this->disappeared.insert({object_ID, 0});
     this->nextObjectID += 1;
-
-    for (auto elem : this->objects) {
-        std::cout << "CHECKING OBJECTS: " << elem.first << " " << elem.second.first << " " << elem.second.second
-                  << "\n";
-    }
 }
 
 void CentroidTracker::deregister_Object(int objectID) {
@@ -46,9 +40,6 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
     if (boxes.empty()) {
         if (!this->disappeared.empty()) {
             for (auto elem : this->disappeared) {
-                std::cout << "CHECKING DISAPPEARED: " << elem.first << " " << elem.second << " "
-                          << this->disappeared.size()
-                          << endl;
                 this->disappeared[elem.first]++;
 
                 if (elem.second > this->maxDisappeared) {
@@ -81,8 +72,6 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
 
 // otherwise, there are currently tracking objects so we need to try to match the
 // input centroids to existing object centroids
-
-// grab the set of object IDs and corresponding centroids
     else {
         vector<int> objectIDs;
         vector<vector<int>> objectCentroids;
@@ -92,7 +81,6 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         }
 
         vector<map<float, int>> Distances;
-        vector<vector<float>> D;
 
         for (vector<vector<int>>::size_type i = 0; i < objectCentroids.size(); ++i) {
             vector<float> temp;
@@ -104,7 +92,6 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
                 temp_map.insert({dist, j});
                 temp.push_back(dist);
             }
-            D.push_back(temp);
             Distances.push_back(temp_map);
         }
 
@@ -139,7 +126,7 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         }
 
         // compute indexes we have NOT examined yet
-        set_difference(used.begin(), used.end(), rows.begin(), rows.end(), inserter(unused, unused.end()));
+        set_symmetric_difference(rows.begin(), rows.end(), used.begin(), used.end(), inserter(unused, unused.begin()));
 
         if (objectCentroids.size() >= inputCentroids.size()) {
             // loop over unused row indexes
@@ -152,11 +139,15 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
                     this->deregister_Object(objectID);
                 }
             }
-        } else if (inputCentroids.size() > objectCentroids.size()) {
+        } else if (objectCentroids.size() <= inputCentroids.size()) {
             for (auto row: unused) {
                 this->register_Object(inputCentroids[row][0], inputCentroids[row][1]);
             }
         }
     }
+    for (auto obj: this->objects){
+//        cout << obj.first << endl;
+    }
+    inputCentroids.clear();
     return this->objects;
 }
