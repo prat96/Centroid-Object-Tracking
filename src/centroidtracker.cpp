@@ -44,11 +44,12 @@ void CentroidTracker::deregister_Object(int objectID) {
 std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> boxes) {
 
     if (boxes.empty()) {
-        if (!disappeared.empty()) {
+        if (!this->disappeared.empty()) {
             for (auto elem : this->disappeared) {
-                std::cout << "CHECKING DISAPPEARED: " << elem.first << " " << elem.second << " " << disappeared.size()
+                std::cout << "CHECKING DISAPPEARED: " << elem.first << " " << elem.second << " "
+                          << this->disappeared.size()
                           << endl;
-                disappeared[elem.first]++;
+                this->disappeared[elem.first]++;
 
                 if (elem.second > this->maxDisappeared) {
                     this->deregister_Object(elem.first);
@@ -118,17 +119,11 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         };
 
         sort(Distances.begin(), Distances.end(), vecRowSort());
-        cout << "SORTED" << endl;
 
         for (auto i: Distances) {
             for (auto j: i) {
-//                cout << j.first << " " << j.second << endl;
                 rows.push_back(j.second);
             }
-//            for (auto r: rows) {
-//                cout << "ROWS CHECK: " << r << endl;
-//                cout << inputCentroids[r][0] << " " << inputCentroids[r][1] << endl;
-//            }
         }
 
         set<double> used;
@@ -138,8 +133,8 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
             if (used.count(r)) { continue; }
 
             int objectID = objectIDs[r];
-            this->objects.at(objectID) = {inputCentroids[r][0], inputCentroids[r][1]};
-            this->disappeared.at(objectID) = 0;
+            this->objects[objectID] = {inputCentroids[r][0], inputCentroids[r][1]};
+            this->disappeared[objectID] = 0;
 
             used.insert(r);
         }
@@ -147,6 +142,22 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         // compute indexes we have NOT examined yet
         set_difference(rows.begin(), rows.end(), used.begin(), used.end(), inserter(unused, unused.end()));
 
+        if (objectCentroids.size() >= inputCentroids.size()) {
+            // loop over unused row indexes
+            for (auto row: unused) {
+
+                int objectID = objectIDs[row];
+                this->disappeared[objectID]++;
+
+                if (this->disappeared[objectID] > this->maxDisappeared) {
+                    this->deregister_Object(objectID);
+                }
+            }
+        } else if (inputCentroids.size() > objectCentroids.size()) {
+            for (auto row: unused) {
+                this->register_Object(inputCentroids[row][0], inputCentroids[row][1]);
+            }
+        }
     }
     cout << "<----------------------->" << "\n" << endl;
     return this->objects;

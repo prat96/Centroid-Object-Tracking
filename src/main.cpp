@@ -65,6 +65,14 @@ int main() {
 
         auto objects = centroidTracker->update(boxes);
 
+        for (auto obj: objects) {
+            circle(cameraFrame, Point(obj.second.first, obj.second.second), 4, Scalar(255, 0, 0), -1);
+            string ID = to_string(obj.first);
+            cv::putText(cameraFrame, ID, Point(obj.second.first - 10, obj.second.second - 10),
+                        FONT_HERSHEY_COMPLEX, 0.5, Scalar(0, 255, 0), 2);
+        }
+
+
         imshow("Detection", cameraFrame);
 //        waitKey(0);
         if (waitKey(30) >= 0)
