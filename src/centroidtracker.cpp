@@ -77,7 +77,6 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         for (auto &inp: inputCentroids) {
             this->register_Object(inp.second[0], inp.second[1]);
         }
-//        this->objects.insert({14, {15, 68}});
     }
 
 // otherwise, there are currently tracking objects so we need to try to match the
@@ -140,7 +139,7 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         }
 
         // compute indexes we have NOT examined yet
-        set_difference(rows.begin(), rows.end(), used.begin(), used.end(), inserter(unused, unused.end()));
+        set_difference(used.begin(), used.end(), rows.begin(), rows.end(), inserter(unused, unused.end()));
 
         if (objectCentroids.size() >= inputCentroids.size()) {
             // loop over unused row indexes
@@ -159,6 +158,5 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
             }
         }
     }
-    cout << "<----------------------->" << "\n" << endl;
     return this->objects;
 }

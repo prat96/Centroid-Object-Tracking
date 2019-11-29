@@ -67,6 +67,7 @@ int main() {
 
         for (auto obj: objects) {
             circle(cameraFrame, Point(obj.second.first, obj.second.second), 4, Scalar(255, 0, 0), -1);
+            cout << "INT" << obj.first << endl;
             string ID = to_string(obj.first);
             cv::putText(cameraFrame, ID, Point(obj.second.first - 10, obj.second.second - 10),
                         FONT_HERSHEY_COMPLEX, 0.5, Scalar(0, 255, 0), 2);
