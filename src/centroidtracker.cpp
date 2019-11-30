@@ -49,22 +49,17 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
     }
 
     // initialize an array of input centroids for the current frame
-    std::map<int, std::vector<int>> inputCentroids;
-    // loop over the bounding box rectangles
-    int k = 0;
+    vector<pair<int, int>> inputCentroids;
     for (auto b : boxes) {
-        // use the bounding box coordinates to derive the centroid
         int cX = int((b[0] + b[2]) / 2.0);
         int cY = int((b[1] + b[3]) / 2.0);
-        inputCentroids.insert(pair<int, vector<int>>({k, {cX, cY}}));
-        k++;
+        inputCentroids.push_back(make_pair(cX, cY));
     }
-
 
 //if we are currently not tracking any objects take the input centroids and register each of them
     if (this->objects.empty()) {
-        for (auto &inp: inputCentroids) {
-            this->register_Object(inp.second[0], inp.second[1]);
+        for (auto i: inputCentroids) {
+            this->register_Object(i.first, i.second);
         }
     }
 
@@ -72,99 +67,98 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
 // input centroids to existing object centroids
     else {
         vector<int> objectIDs;
-        vector<vector<int>> objectCentroids;
-        for (auto &object : this->objects) {
+        vector<pair<int, int>> objectCentroids;
+        for (auto object : this->objects) {
             objectIDs.push_back(object.first);
-            objectCentroids.push_back({object.second.first, object.second.second});
+            objectCentroids.push_back(make_pair(object.second.first, object.second.second));
         }
 
-        vector<map<float, int>> Distances;
+//        Calculate Distances
+    vector<vector<float>> Distances;
+    for (int i = 0; i < objectCentroids.size(); ++i) {
+        vector<float> temp_D;
+        for (vector<vector<int>>::size_type j = 0; j < inputCentroids.size(); ++j) {
+            double dist = calcDistance(objectCentroids[i].first, objectCentroids[i].second, inputCentroids[j].first,
+                                       inputCentroids[j].second);
 
-        for (vector<vector<int>>::size_type i = 0; i < objectCentroids.size(); ++i) {
-            map<float, int> temp_map;
-            for (vector<vector<int>>::size_type j = 0; j < inputCentroids.size(); ++j) {
-                double dist = calcDistance(objectCentroids[i][0], objectCentroids[i][1], inputCentroids[j][0],
-                                           inputCentroids[j][1]);
-
-                temp_map.insert({dist, j});
-            }
-            Distances.push_back(temp_map);
+            temp_D.push_back(dist);
         }
+        Distances.push_back(temp_D);
+    }
 
-        for (auto i: Distances) {
-            cout << "D: ";
-            for (auto d: i) {
-                cout << " " << d.first << " " << flush;
-            }
-            cout << endl;
+    // Distances check
+    /*
+    for (auto i: Distances) {
+        cout << "D: " << flush;
+        for (auto j : i){
+            cout << j << " " << flush;
         }
+        cout << endl;
+    }
+    */
 
-        struct vecRowSort {
-            bool operator()(const map<float, int> &first, const map<float, int> &second) const {
-                return first.begin()->first < second.begin()->first;
-            }
-        };
-
-        sort(Distances.begin(), Distances.end(), vecRowSort());
-
-        vector<int> cols;
-        vector<int> rows;
-
-        // load rows
-        for (auto i: Distances) {
-            rows.push_back(i.begin()->second);
+    /*
+    struct vecRowSort {
+        bool operator()(const map<float, int> &first, const map<float, int> &second) const {
+            return first.begin()->first < second.begin()->first;
         }
+    };
 
-        map<float, int>::iterator it;
+    sort(Distances.begin(), Distances.end(), vecRowSort());
 
-        //load cols
-        for (int i = 0; i < Distances[0].size(); i++){
-            float min = Distances[i].begin()->first;
-            for (int j = 1; j < Distances.size(); j++){
-                it = Distances[i].begin() + j;
-                if (std::advance(Distances[i].begin(), j)->first )
+    vector<int> cols;
+    vector<int> rows;
+
+    // load rows
+    for (auto i: Distances) {
+        rows.push_back(i.begin()->second);
+    }
+
+    map<float, int>::iterator it;
+
+    //load cols
+
+
+    cout << "D size: " << Distances.size() << endl;
+    cout << "Row size: " << rows.size() << endl;
+
+    set<double> used;
+    set<double> unused;
+
+    for (auto r: rows) {
+        if (used.count(r)) { continue; }
+
+        int objectID = objectIDs[r];
+        this->objects[objectID] = {inputCentroids[r][0], inputCentroids[r][1]};
+        this->disappeared[objectID] = 0;
+
+        used.insert(r);
+    }
+
+    // compute indexes we have NOT examined yet
+    set_symmetric_difference(rows.begin(), rows.end(), used.begin(), used.end(), inserter(unused, unused.begin()));
+
+    if (objectCentroids.size() >= inputCentroids.size()) {
+        // loop over unused row indexes
+        for (auto row: unused) {
+
+            int objectID = objectIDs[row];
+            this->disappeared[objectID]++;
+
+            if (this->disappeared[objectID] > this->maxDisappeared) {
+                this->deregister_Object(objectID);
             }
         }
-
-
-        cout << "D size: " << Distances.size() << endl;
-        cout << "Row size: " << rows.size() << endl;
-
-        set<double> used;
-        set<double> unused;
-
-        for (auto r: rows) {
-            if (used.count(r)) { continue; }
-
-            int objectID = objectIDs[r];
-            this->objects[objectID] = {inputCentroids[r][0], inputCentroids[r][1]};
-            this->disappeared[objectID] = 0;
-
-            used.insert(r);
-        }
-
-        // compute indexes we have NOT examined yet
-        set_symmetric_difference(rows.begin(), rows.end(), used.begin(), used.end(), inserter(unused, unused.begin()));
-
-        if (objectCentroids.size() >= inputCentroids.size()) {
-            // loop over unused row indexes
-            for (auto row: unused) {
-
-                int objectID = objectIDs[row];
-                this->disappeared[objectID]++;
-
-                if (this->disappeared[objectID] > this->maxDisappeared) {
-                    this->deregister_Object(objectID);
-                }
-            }
-        } else {
-            for (auto row: unused) {
-                this->register_Object(inputCentroids[row][0], inputCentroids[row][1]);
-            }
+    } else {
+        for (auto row: unused) {
+            this->register_Object(inputCentroids[row][0], inputCentroids[row][1]);
         }
     }
+    }
     for (auto obj: this->objects) {
-//        cout << obj.first << endl;
+    //        cout << obj.first << endl;
+    }
+    */
     }
     cout << "<---------------------->" << endl;
     return this->objects;
