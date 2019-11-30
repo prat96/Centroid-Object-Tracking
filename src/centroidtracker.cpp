@@ -43,6 +43,11 @@ std::vector<float>::size_type findMin(const std::vector<float> &v, std::vector<f
 }
 
 std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> boxes) {
+    struct vecRowSort {
+        bool operator()(const vector<float> &first, const vector<float> &second) const {
+            return first[0] < second[0];
+        }
+    };
 
     if (boxes.empty()) {
         if (!this->disappeared.empty()) {
@@ -105,10 +110,10 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
             rows.push_back(temp);
         }
 
-        for (auto r: rows){
-            cout << "Rows: " << r << " " << flush;
-        }
-        cout << endl;
+//        for (auto r: rows){
+//            cout << "Rows: " << r << " " << flush;
+//        }
+//        cout << endl;
 
         //sort each mat row for col calculation
         vector<vector<float>> D_copy;
@@ -116,6 +121,10 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
             sort(v.begin(), v.end());
             D_copy.push_back(v);
         }
+
+        // sort mat by rows
+        sort(D_copy.begin(), D_copy.end(), vecRowSort());
+
 
         /*
         // Distances check
