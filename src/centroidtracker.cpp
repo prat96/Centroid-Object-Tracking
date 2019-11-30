@@ -105,16 +105,12 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         vector<int> rows;
 
         //find indices for rows
-        for (auto v: Distances){
+        for (auto v: Distances) {
             auto temp = findMin(v);
             rows.push_back(temp);
         }
 
-//        for (auto r: rows){
-//            cout << "Rows: " << r << " " << flush;
-//        }
-//        cout << endl;
-
+        //col calculation
         //sort each mat row for col calculation
         vector<vector<float>> D_copy;
         for (auto v: Distances) {
@@ -122,11 +118,36 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
             D_copy.push_back(v);
         }
 
-        // sort mat by rows
+        // use row calc to find cols
+        // slice first elem of each col
+        map<float, int> temp_col;
+        int k = 0;
+        for (auto i: D_copy) {
+            temp_col.insert({i[0], k});
+            k++;
+        }
+        //print sorted indices of temp_col
+        for (auto const &x : temp_col) {
+            std::cout << x.first << ':' << x.second << std::endl;
+            cols.push_back(x.second);
+        }
+
+        //sort mat by rows
         sort(D_copy.begin(), D_copy.end(), vecRowSort());
 
+        // <--------------All print checks---------------->
+        //rows check
+        for (auto r: rows) {
+            cout << "Rows: " << r << " " << flush;
+        }
+        cout << endl;
 
-        /*
+        //cols  check
+        for (auto c: cols) {
+            cout << "Cols: " << c << " " << flush;
+        }
+        cout << endl;
+
         // Distances check
         for (auto i: Distances) {
             cout << "D: ";
@@ -138,38 +159,22 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
 
         // D_copy check
         for (auto i: D_copy) {
-            cout << "D: ";
+            cout << "D_copy: ";
             for (auto j : i) {
                 cout << j << " " << flush;
             }
             cout << endl;
         }
-        */
+        // <--------------All print checks---------------->
+
+
+
+
+
+
 
 
         /*
-        vector<int> cols;
-        vector<int> rows;
-
-        struct vecRowSort {
-            bool operator()(const map<float, int> &first, const map<float, int> &second) const {
-                return first.begin()->first < second.begin()->first;
-            }
-        };
-
-
-        // load rows
-        for (auto i: Distances) {
-            rows.push_back(i.begin()->second);
-        }
-
-        map<float, int>::iterator it;
-
-        //load cols
-
-        cout << "D size: " << Distances.size() << endl;
-        cout << "Row size: " << rows.size() << endl;
-
         set<double> used;
         set<double> unused;
 
