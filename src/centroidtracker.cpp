@@ -104,32 +104,32 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         vector<int> cols;
         vector<int> rows;
 
-        //find indices for rows
+        //find indices for cols
         for (auto v: Distances) {
             auto temp = findMin(v);
-            rows.push_back(temp);
+            cols.push_back(temp);
         }
 
-        //col calculation
-        //sort each mat row for col calculation
+        //rows calculation
+        //sort each mat row for rows calculation
         vector<vector<float>> D_copy;
         for (auto v: Distances) {
             sort(v.begin(), v.end());
             D_copy.push_back(v);
         }
 
-        // use row calc to find cols
-        // slice first elem of each col
-        map<float, int> temp_col;
+        // use cols calc to find rows
+        // slice first elem of each column
+        map<float, int> temp_rows;
         int k = 0;
         for (auto i: D_copy) {
-            temp_col.insert({i[0], k});
+            temp_rows.insert({i[0], k});
             k++;
         }
-        //print sorted indices of temp_col
-        for (auto const &x : temp_col) {
+        //print sorted indices of temp_rows
+        for (auto const &x : temp_rows) {
             std::cout << x.first << ':' << x.second << std::endl;
-            cols.push_back(x.second);
+            rows.push_back(x.second);
         }
 
         //sort mat by rows
@@ -167,7 +167,8 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         }
         // <--------------All print checks---------------->
 
-
+        set<double> used;
+        set<double> unused;
 
 
 
@@ -175,8 +176,7 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
 
 
         /*
-        set<double> used;
-        set<double> unused;
+
 
         for (auto r: rows) {
             if (used.count(r)) { continue; }
