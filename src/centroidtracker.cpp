@@ -167,52 +167,62 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         }
         // <--------------All print checks---------------->
 
-        set<double> used;
-        set<double> unused;
+        set<int> usedRows;
+        set<int> usedCols;
 
-
-
-
-
-
-        /*
-
-
-        for (auto r: rows) {
-            if (used.count(r)) { continue; }
-
-            int objectID = objectIDs[r];
-            this->objects[objectID] = {inputCentroids[r][0], inputCentroids[r][1]};
+        //loop over the combination of the (rows, columns) index tuples
+        for (int i = 0; i < rows.size(); i++) {
+            //if we have already examined either the row or column value before, ignore it
+            if (usedRows.count(rows[i]) || usedCols.count(cols[i])) { continue; }
+            //otherwise, grab the object ID for the current row, set its new centroid,
+            // and reset the disappeared counter
+            int objectID = objectIDs[rows[i]];
+            this->objects[objectID] = inputCentroids[cols[i]];
             this->disappeared[objectID] = 0;
 
-            used.insert(r);
+            usedRows.insert(rows[i]);
+            usedCols.insert(cols[i]);
         }
 
         // compute indexes we have NOT examined yet
-        set_symmetric_difference(rows.begin(), rows.end(), used.begin(), used.end(), inserter(unused, unused.begin()));
+        set<int> objRows;
+        set<int> inpCols;
 
+        //D.shape[0]
+        for (int i = 0; i < objectCentroids.size(); i++) {
+            objRows.insert(i);
+        }
+        //D.shape[1]
+        for (int i = 0; i < inputCentroids.size(); i++) {
+            inpCols.insert(i);
+        }
+
+        set<int> unusedRows;
+        set<int> unusedCols;
+
+        set_difference(objRows.begin(), objRows.end(), usedRows.begin(), usedRows.end(),
+                       inserter(unusedRows, unusedRows.begin()));
+        set_difference(inpCols.begin(), inpCols.end(), usedCols.begin(), usedCols.end(),
+                       inserter(unusedCols, unusedCols.begin()));
+
+
+        //If objCentroids > InpCentroids, we need to check and see if some of these objects have potentially disappeared
         if (objectCentroids.size() >= inputCentroids.size()) {
             // loop over unused row indexes
-            for (auto row: unused) {
-
+            for (auto row: unusedRows) {
                 int objectID = objectIDs[row];
-                this->disappeared[objectID]++;
+                this->disappeared[objectID] += 1;
 
                 if (this->disappeared[objectID] > this->maxDisappeared) {
                     this->deregister_Object(objectID);
                 }
             }
         } else {
-            for (auto row: unused) {
-                this->register_Object(inputCentroids[row][0], inputCentroids[row][1]);
+            for (auto col: unusedCols){
+                this->register_Object(inputCentroids[col].first, inputCentroids[col].second);
             }
         }
-        }
-        for (auto obj: this->objects) {
-        //        cout << obj.first << endl;
-        }
-        */
-    }
+                      }
     cout << "<---------------------->" << endl;
     return this->objects;
 }
