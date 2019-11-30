@@ -101,6 +101,15 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
             cout << endl;
         }
 
+//        for (auto i: Distances) {
+//            cout << "D index: ";
+//            for (auto d: i) {
+//                cout << " " << d.second << " " << flush;
+//            }
+//            cout << endl;
+//        }
+
+
 
         vector<int> rows;
         vector<int> cols;
@@ -114,10 +123,11 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         sort(Distances.begin(), Distances.end(), vecRowSort());
 
         for (auto i: Distances) {
-            for (auto j: i) {
-                rows.push_back(j.second);
-            }
+            rows.push_back(i.begin()->second);
         }
+
+        cout << "D size: " << Distances.size() << endl;
+        cout << "Row size: " << rows.size() << endl;
 
         set<double> used;
         set<double> unused;
