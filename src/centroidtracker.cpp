@@ -33,6 +33,15 @@ void CentroidTracker::deregister_Object(int objectID) {
     }
 }
 
+std::vector<float>::size_type findMin(const std::vector<float> &v, std::vector<float>::size_type pos = 0) {
+    if (v.size() <= pos) return (v.size());
+    std::vector<float>::size_type min = pos;
+    for (std::vector<float>::size_type i = pos + 1; i < v.size(); i++) {
+        if (v[i] < v[min]) min = i;
+    }
+    return (min);
+}
+
 std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> boxes) {
 
     if (boxes.empty()) {
@@ -74,91 +83,121 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         }
 
 //        Calculate Distances
-    vector<vector<float>> Distances;
-    for (int i = 0; i < objectCentroids.size(); ++i) {
-        vector<float> temp_D;
-        for (vector<vector<int>>::size_type j = 0; j < inputCentroids.size(); ++j) {
-            double dist = calcDistance(objectCentroids[i].first, objectCentroids[i].second, inputCentroids[j].first,
-                                       inputCentroids[j].second);
+        vector<vector<float>> Distances;
+        for (int i = 0; i < objectCentroids.size(); ++i) {
+            vector<float> temp_D;
+            for (vector<vector<int>>::size_type j = 0; j < inputCentroids.size(); ++j) {
+                double dist = calcDistance(objectCentroids[i].first, objectCentroids[i].second, inputCentroids[j].first,
+                                           inputCentroids[j].second);
 
-            temp_D.push_back(dist);
+                temp_D.push_back(dist);
+            }
+            Distances.push_back(temp_D);
         }
-        Distances.push_back(temp_D);
-    }
 
-    // Distances check
-    /*
-    for (auto i: Distances) {
-        cout << "D: " << flush;
-        for (auto j : i){
-            cout << j << " " << flush;
+        // load rows and cols
+        vector<int> cols;
+        vector<int> rows;
+
+        //find indices for rows
+        for (auto v: Distances){
+            auto temp = findMin(v);
+            rows.push_back(temp);
+        }
+
+        for (auto r: rows){
+            cout << "Rows: " << r << " " << flush;
         }
         cout << endl;
-    }
-    */
 
-    /*
-    struct vecRowSort {
-        bool operator()(const map<float, int> &first, const map<float, int> &second) const {
-            return first.begin()->first < second.begin()->first;
+        //sort each mat row for col calculation
+        vector<vector<float>> D_copy;
+        for (auto v: Distances) {
+            sort(v.begin(), v.end());
+            D_copy.push_back(v);
         }
-    };
 
-    sort(Distances.begin(), Distances.end(), vecRowSort());
+        /*
+        // Distances check
+        for (auto i: Distances) {
+            cout << "D: ";
+            for (auto j : i) {
+                cout << j << " " << flush;
+            }
+            cout << endl;
+        }
 
-    vector<int> cols;
-    vector<int> rows;
-
-    // load rows
-    for (auto i: Distances) {
-        rows.push_back(i.begin()->second);
-    }
-
-    map<float, int>::iterator it;
-
-    //load cols
+        // D_copy check
+        for (auto i: D_copy) {
+            cout << "D: ";
+            for (auto j : i) {
+                cout << j << " " << flush;
+            }
+            cout << endl;
+        }
+        */
 
 
-    cout << "D size: " << Distances.size() << endl;
-    cout << "Row size: " << rows.size() << endl;
+        /*
+        vector<int> cols;
+        vector<int> rows;
 
-    set<double> used;
-    set<double> unused;
+        struct vecRowSort {
+            bool operator()(const map<float, int> &first, const map<float, int> &second) const {
+                return first.begin()->first < second.begin()->first;
+            }
+        };
 
-    for (auto r: rows) {
-        if (used.count(r)) { continue; }
 
-        int objectID = objectIDs[r];
-        this->objects[objectID] = {inputCentroids[r][0], inputCentroids[r][1]};
-        this->disappeared[objectID] = 0;
+        // load rows
+        for (auto i: Distances) {
+            rows.push_back(i.begin()->second);
+        }
 
-        used.insert(r);
-    }
+        map<float, int>::iterator it;
 
-    // compute indexes we have NOT examined yet
-    set_symmetric_difference(rows.begin(), rows.end(), used.begin(), used.end(), inserter(unused, unused.begin()));
+        //load cols
 
-    if (objectCentroids.size() >= inputCentroids.size()) {
-        // loop over unused row indexes
-        for (auto row: unused) {
+        cout << "D size: " << Distances.size() << endl;
+        cout << "Row size: " << rows.size() << endl;
 
-            int objectID = objectIDs[row];
-            this->disappeared[objectID]++;
+        set<double> used;
+        set<double> unused;
 
-            if (this->disappeared[objectID] > this->maxDisappeared) {
-                this->deregister_Object(objectID);
+        for (auto r: rows) {
+            if (used.count(r)) { continue; }
+
+            int objectID = objectIDs[r];
+            this->objects[objectID] = {inputCentroids[r][0], inputCentroids[r][1]};
+            this->disappeared[objectID] = 0;
+
+            used.insert(r);
+        }
+
+        // compute indexes we have NOT examined yet
+        set_symmetric_difference(rows.begin(), rows.end(), used.begin(), used.end(), inserter(unused, unused.begin()));
+
+        if (objectCentroids.size() >= inputCentroids.size()) {
+            // loop over unused row indexes
+            for (auto row: unused) {
+
+                int objectID = objectIDs[row];
+                this->disappeared[objectID]++;
+
+                if (this->disappeared[objectID] > this->maxDisappeared) {
+                    this->deregister_Object(objectID);
+                }
+            }
+        } else {
+            for (auto row: unused) {
+                this->register_Object(inputCentroids[row][0], inputCentroids[row][1]);
             }
         }
-    } else {
-        for (auto row: unused) {
-            this->register_Object(inputCentroids[row][0], inputCentroids[row][1]);
         }
-    }
-    }
-    for (auto obj: this->objects) {
-    //        cout << obj.first << endl;
-    }
-    */
+        for (auto obj: this->objects) {
+        //        cout << obj.first << endl;
+        }
+        */
     }
     cout << "<---------------------->" << endl;
     return this->objects;
