@@ -1,8 +1,6 @@
 /*
 Created by pratheek on 2019-11-27.
 */
-#include <set>
-#include <algorithm>
 #include "centroidtracker.h"
 
 using namespace std;
@@ -101,19 +99,6 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
             cout << endl;
         }
 
-//        for (auto i: Distances) {
-//            cout << "D index: ";
-//            for (auto d: i) {
-//                cout << " " << d.second << " " << flush;
-//            }
-//            cout << endl;
-//        }
-
-
-
-        vector<int> rows;
-        vector<int> cols;
-
         struct vecRowSort {
             bool operator()(const map<float, int> &first, const map<float, int> &second) const {
                 return first.begin()->first < second.begin()->first;
@@ -122,9 +107,25 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
 
         sort(Distances.begin(), Distances.end(), vecRowSort());
 
+        vector<int> cols;
+        vector<int> rows;
+
+        // load rows
         for (auto i: Distances) {
             rows.push_back(i.begin()->second);
         }
+
+        map<float, int>::iterator it;
+
+        //load cols
+        for (int i = 0; i < Distances[0].size(); i++){
+            float min = Distances[i].begin()->first;
+            for (int j = 1; j < Distances.size(); j++){
+                it = Distances[i].begin() + j;
+                if (std::advance(Distances[i].begin(), j)->first )
+            }
+        }
+
 
         cout << "D size: " << Distances.size() << endl;
         cout << "Row size: " << rows.size() << endl;
@@ -133,7 +134,6 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         set<double> unused;
 
         for (auto r: rows) {
-            cout << "Check r:" << r << endl;
             if (used.count(r)) { continue; }
 
             int objectID = objectIDs[r];
