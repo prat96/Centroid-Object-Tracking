@@ -12,6 +12,7 @@ int main() {
     int W = 300;
     auto centroidTracker = new CentroidTracker(40);
 
+    int frame_number = 0;
 //    VideoCapture cap(0);
     VideoCapture cap("../../test.mp4");
     if (!cap.isOpened()) {
@@ -69,8 +70,10 @@ int main() {
                         FONT_HERSHEY_COMPLEX, 0.5, Scalar(0, 255, 0), 2);
         }
 
+        cout << "FRAME-> " << frame_number << endl;
+        ++frame_number;
         imshow("Detection", cameraFrame);
-        char c = (char) waitKey(10);
+        char c = (char) waitKey(0);
         if (c == 27)
             break;
     }

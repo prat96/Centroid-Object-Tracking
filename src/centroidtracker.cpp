@@ -83,17 +83,24 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         vector<map<float, int>> Distances;
 
         for (vector<vector<int>>::size_type i = 0; i < objectCentroids.size(); ++i) {
-            vector<float> temp;
             map<float, int> temp_map;
             for (vector<vector<int>>::size_type j = 0; j < inputCentroids.size(); ++j) {
                 double dist = calcDistance(objectCentroids[i][0], objectCentroids[i][1], inputCentroids[j][0],
                                            inputCentroids[j][1]);
 
                 temp_map.insert({dist, j});
-                temp.push_back(dist);
             }
             Distances.push_back(temp_map);
         }
+
+        for (auto i: Distances) {
+            cout << "D: ";
+            for (auto d: i) {
+                cout << " " << d.first << " " << flush;
+            }
+            cout << endl;
+        }
+
 
         vector<int> rows;
         vector<int> cols;
@@ -116,6 +123,7 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         set<double> unused;
 
         for (auto r: rows) {
+            cout << "Check r:" << r << endl;
             if (used.count(r)) { continue; }
 
             int objectID = objectIDs[r];
@@ -139,15 +147,15 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
                     this->deregister_Object(objectID);
                 }
             }
-        } else if (objectCentroids.size() <= inputCentroids.size()) {
+        } else {
             for (auto row: unused) {
                 this->register_Object(inputCentroids[row][0], inputCentroids[row][1]);
             }
         }
     }
-    for (auto obj: this->objects){
+    for (auto obj: this->objects) {
 //        cout << obj.first << endl;
     }
-    inputCentroids.clear();
+    cout << "<---------------------->" << endl;
     return this->objects;
 }
