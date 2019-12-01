@@ -10,7 +10,7 @@ using namespace std;
 int main() {
     std::cout << "Hello, Tracker!" << std::endl;
     int W = 300;
-    auto centroidTracker = new CentroidTracker(10);
+    auto centroidTracker = new CentroidTracker(15);
 
     VideoCapture cap(0);
 //    VideoCapture cap("../../test.mp4");
@@ -18,8 +18,8 @@ int main() {
         cout << "Cannot open camera";
     }
 
-    String modelTxt = "../../deploy.prototxt";
-    String modelBin = "../../res10_300x300_ssd_iter_140000.caffemodel";
+    String modelTxt = "../model/deploy.prototxt";
+    String modelBin = "../model/res10_300x300_ssd_iter_140000.caffemodel";
 
     cout << "Loading model.." << endl;
     auto net = dnn::readNetFromCaffe(modelTxt, modelBin);
