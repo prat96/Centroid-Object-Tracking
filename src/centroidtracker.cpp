@@ -126,10 +126,10 @@ std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<
 
         // use cols calc to find rows
         // slice first elem of each column
-        map<float, int> temp_rows;
+        vector<pair<float, int>> temp_rows;
         int k = 0;
         for (auto i: D_copy) {
-            temp_rows.insert({i[0], k});
+            temp_rows.push_back(make_pair(i[0], k));
             k++;
         }
         //print sorted indices of temp_rows

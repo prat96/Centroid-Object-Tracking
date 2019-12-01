@@ -13,8 +13,8 @@ int main() {
     auto centroidTracker = new CentroidTracker(40);
 
     int frame_number = 0;
-//    VideoCapture cap(0);
-    VideoCapture cap("../../test2.mp4");
+    VideoCapture cap(0);
+//    VideoCapture cap("../../test2.mp4");
     if (!cap.isOpened()) {
         cout << "Cannot open camera";
     }
@@ -75,7 +75,7 @@ int main() {
         cout << "FRAME-> " << frame_number << endl;
         ++frame_number;
         imshow("Detection", cameraFrame);
-        char c = (char) waitKey(0);
+        char c = (char) waitKey(1);
         if (c == 27)
             break;
     }
