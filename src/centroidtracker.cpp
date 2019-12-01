@@ -20,7 +20,7 @@ double CentroidTracker::calcDistance(double x1, double y1, double x2, double y2)
 
 void CentroidTracker::register_Object(int cX, int cY) {
     int object_ID = this->nextObjectID;
-    this->objects.insert({object_ID, {cX, cY}});
+    this->objects.push_back({object_ID, {cX, cY}});
     this->disappeared.insert({object_ID, 0});
     this->nextObjectID += 1;
 }
@@ -28,7 +28,11 @@ void CentroidTracker::register_Object(int cX, int cY) {
 void CentroidTracker::deregister_Object(int objectID) {
     cout << "Deregistered object: " << objectID << endl;
     if (!this->objects.empty()) {
-        this->objects.erase(objectID);
+        for (int i=0; i < this->objects.size(); i++){
+            if(this->objects[i].first == objectID){
+                this->objects.erase(this->objects.begin() + i);
+            }
+        }
         this->disappeared.erase(objectID);
     }
 }
@@ -42,7 +46,7 @@ vector<float>::size_type findMin(const vector<float> &v, vector<float>::size_typ
     return (min);
 }
 
-std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> boxes) {
+std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<vector<int>> boxes) {
     struct vecRowSort {
         bool operator()(const vector<float> &first, const vector<float> &second) const {
             return first[0] < second[0];
@@ -179,7 +183,13 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
             //otherwise, grab the object ID for the current row, set its new centroid,
             // and reset the disappeared counter
             int objectID = objectIDs[rows[i]];
-            this->objects[objectID] = inputCentroids[cols[i]];
+            for (int t=0; t < this->objects.size(); t++){
+                if(this->objects[t].first == objectID){
+                    this->objects[t].second.first = inputCentroids[cols[i]].first;
+                    this->objects[t].second.second = inputCentroids[cols[i]].second;
+                }
+            }
+//            this->objects[objectID] = inputCentroids[cols[i]];
             this->disappeared[objectID] = 0;
 
             usedRows.insert(rows[i]);

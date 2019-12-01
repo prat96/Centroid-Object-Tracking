@@ -13,7 +13,6 @@ Created by pratheek on 2019-11-27.
 #include <cmath>
 #include <set>
 #include <algorithm>
-#include <unordered_map>
 
 class CentroidTracker {
 public:
@@ -23,10 +22,10 @@ public:
 
     void deregister_Object(int objectID);
 
-    std::map<int, std::pair<int, int>> update(std::vector<std::vector<int>> boxes);
+    std::vector<std::pair<int, std::pair<int, int>>> update(std::vector<std::vector<int>> boxes);
 
-    // <ID, centroid>
-    std::map<int, std::pair<int, int>> objects;
+    // <ID, centroids>
+    std::vector<std::pair<int, std::pair<int, int>>> objects;
 private:
     int maxDisappeared;
 

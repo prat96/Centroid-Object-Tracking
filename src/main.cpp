@@ -14,7 +14,7 @@ int main() {
 
     int frame_number = 0;
 //    VideoCapture cap(0);
-    VideoCapture cap("../../test.mp4");
+    VideoCapture cap("../../test2.mp4");
     if (!cap.isOpened()) {
         cout << "Cannot open camera";
     }
@@ -52,6 +52,9 @@ int main() {
                 Rect object((int) xLeftTop, (int) yLeftTop, (int) (xRightBottom - xLeftTop),
                             (int) (yRightBottom - yLeftTop));
                 rectangle(cameraFrame, object, Scalar(0, 255, 0), 2);
+
+                cout << "INP CHECK: " << int((xLeftTop + xRightBottom) / 2.0) << " "
+                     << int((yLeftTop + yRightBottom) / 2.0) << endl;
 
                 boxes.insert(boxes.end(), {xLeftTop, yLeftTop, xRightBottom, yRightBottom});
 
