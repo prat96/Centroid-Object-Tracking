@@ -69,5 +69,6 @@ int main() {
         if (c == 27)
             break;
     }
+    delete centroidTracker;
     return 0;
 }
