@@ -65,7 +65,7 @@ int main() {
                         FONT_HERSHEY_COMPLEX, 0.5, Scalar(0, 255, 0), 2);
         }
         imshow("Detection", cameraFrame);
-        char c = (char) waitKey(0);
+        char c = (char) waitKey(1);
         if (c == 27)
             break;
     }
