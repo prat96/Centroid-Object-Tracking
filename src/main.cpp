@@ -30,9 +30,8 @@ int main() {
         Mat cameraFrame;
         cap.read(cameraFrame);
 
-        Mat resized_camFrame;
-        resize(cameraFrame, resized_camFrame, Size(300, 300));
-        auto inputBlob = dnn::blobFromImage(resized_camFrame, 1.0, Size(W, W), Scalar(104.0, 177.0, 123.0));
+        resize(cameraFrame, cameraFrame, Size(400, 300));
+        auto inputBlob = dnn::blobFromImage(cameraFrame, 1.0, Size(400, 300), Scalar(104.0, 177.0, 123.0));
 
         net.setInput(inputBlob);
         auto detection = net.forward("detection_out");

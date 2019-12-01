@@ -33,10 +33,10 @@ void CentroidTracker::deregister_Object(int objectID) {
     }
 }
 
-std::vector<float>::size_type findMin(const std::vector<float> &v, std::vector<float>::size_type pos = 0) {
+vector<float>::size_type findMin(const vector<float> &v, vector<float>::size_type pos = 0) {
     if (v.size() <= pos) return (v.size());
-    std::vector<float>::size_type min = pos;
-    for (std::vector<float>::size_type i = pos + 1; i < v.size(); i++) {
+    vector<float>::size_type min = pos;
+    for (vector<float>::size_type i = pos + 1; i < v.size(); i++) {
         if (v[i] < v[min]) min = i;
     }
     return (min);
@@ -64,12 +64,14 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
 
     // initialize an array of input centroids for the current frame
     vector<pair<int, int>> inputCentroids;
+    cout << "inputCentroids: " << flush;
     for (auto b : boxes) {
         int cX = int((b[0] + b[2]) / 2.0);
         int cY = int((b[1] + b[3]) / 2.0);
         inputCentroids.push_back(make_pair(cX, cY));
+        cout << cX << "," << cY << " " << flush;
     }
-
+    cout << endl;
 //if we are currently not tracking any objects take the input centroids and register each of them
     if (this->objects.empty()) {
         for (auto i: inputCentroids) {
@@ -128,7 +130,7 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
         }
         //print sorted indices of temp_rows
         for (auto const &x : temp_rows) {
-            std::cout << x.first << ':' << x.second << std::endl;
+            cout << x.first << ':' << x.second << endl;
             rows.push_back(x.second);
         }
 
@@ -218,11 +220,11 @@ std::map<int, std::pair<int, int>> CentroidTracker::update(vector<vector<int>> b
                 }
             }
         } else {
-            for (auto col: unusedCols){
+            for (auto col: unusedCols) {
                 this->register_Object(inputCentroids[col].first, inputCentroids[col].second);
             }
         }
-                      }
+    }
     cout << "<---------------------->" << endl;
     return this->objects;
 }

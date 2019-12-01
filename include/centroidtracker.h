@@ -7,13 +7,13 @@ Created by pratheek on 2019-11-27.
 
 #endif //C___CENTROIDTRACKER_H
 
-#include<bits/stdc++.h>
 #include <iostream>
 #include <vector>
 #include <map>
-#include<cmath>
+#include <cmath>
 #include <set>
 #include <algorithm>
+#include <unordered_map>
 
 class CentroidTracker {
 public:
