@@ -10,11 +10,10 @@ using namespace std;
 int main() {
     std::cout << "Hello, Tracker!" << std::endl;
     int W = 300;
-    auto centroidTracker = new CentroidTracker(40);
+    auto centroidTracker = new CentroidTracker(10);
 
-    int frame_number = 0;
     VideoCapture cap(0);
-//    VideoCapture cap("../../test2.mp4");
+//    VideoCapture cap("../../test.mp4");
     if (!cap.isOpened()) {
         cout << "Cannot open camera";
     }
@@ -53,13 +52,7 @@ int main() {
                             (int) (yRightBottom - yLeftTop));
                 rectangle(cameraFrame, object, Scalar(0, 255, 0), 2);
 
-                cout << "INP CHECK: " << int((xLeftTop + xRightBottom) / 2.0) << " "
-                     << int((yLeftTop + yRightBottom) / 2.0) << endl;
-
                 boxes.insert(boxes.end(), {xLeftTop, yLeftTop, xRightBottom, yRightBottom});
-
-//                cv::circle(cameraFrame, Point(cX, cY), 4, Scalar(255, 0, 0), -1);
-//                cv::circle(cameraFrame, Point(xRightBottom, yRightBottom), 4, Scalar(255, 255, 0), -1);
             }
         }
 
@@ -71,9 +64,6 @@ int main() {
             cv::putText(cameraFrame, ID, Point(obj.second.first - 10, obj.second.second - 10),
                         FONT_HERSHEY_COMPLEX, 0.5, Scalar(0, 255, 0), 2);
         }
-
-        cout << "FRAME-> " << frame_number << endl;
-        ++frame_number;
         imshow("Detection", cameraFrame);
         char c = (char) waitKey(1);
         if (c == 27)

@@ -11,7 +11,7 @@ CentroidTracker::CentroidTracker(int maxDisappeared) {
 }
 
 double CentroidTracker::calcDistance(double x1, double y1, double x2, double y2) {
-    double x = x1 - x2; //calculating number to square in next step
+    double x = x1 - x2;
     double y = y1 - y2;
     double dist = sqrt((x * x) + (y * y));       //calculating Euclidean distance
 
@@ -26,7 +26,7 @@ void CentroidTracker::register_Object(int cX, int cY) {
 }
 
 void CentroidTracker::deregister_Object(int objectID) {
-    cout << "Deregistered object: " << objectID << endl;
+    cout << "DeRegistered object: " << objectID << endl;
     if (!this->objects.empty()) {
         for (int i=0; i < this->objects.size(); i++){
             if(this->objects[i].first == objectID){
@@ -47,12 +47,6 @@ vector<float>::size_type findMin(const vector<float> &v, vector<float>::size_typ
 }
 
 std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<vector<int>> boxes) {
-    struct vecRowSort {
-        bool operator()(const vector<float> &first, const vector<float> &second) const {
-            return first[0] < second[0];
-        }
-    };
-
     if (boxes.empty()) {
         if (!this->disappeared.empty()) {
             for (auto elem : this->disappeared) {
@@ -68,23 +62,21 @@ std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<
 
     // initialize an array of input centroids for the current frame
     vector<pair<int, int>> inputCentroids;
-    cout << "inputCentroids: " << flush;
     for (auto b : boxes) {
         int cX = int((b[0] + b[2]) / 2.0);
         int cY = int((b[1] + b[3]) / 2.0);
         inputCentroids.push_back(make_pair(cX, cY));
-        cout << cX << "," << cY << " " << flush;
     }
-    cout << endl;
-//if we are currently not tracking any objects take the input centroids and register each of them
+
+    //if we are currently not tracking any objects take the input centroids and register each of them
     if (this->objects.empty()) {
         for (auto i: inputCentroids) {
             this->register_Object(i.first, i.second);
         }
     }
 
-// otherwise, there are currently tracking objects so we need to try to match the
-// input centroids to existing object centroids
+    // otherwise, there are currently tracking objects so we need to try to match the
+    // input centroids to existing object centroids
     else {
         vector<int> objectIDs;
         vector<pair<int, int>> objectCentroids;
@@ -134,44 +126,8 @@ std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<
         }
         //print sorted indices of temp_rows
         for (auto const &x : temp_rows) {
-            cout << x.first << ':' << x.second << endl;
             rows.push_back(x.second);
         }
-
-        //sort mat by rows
-        sort(D_copy.begin(), D_copy.end(), vecRowSort());
-
-        // <--------------All print checks---------------->
-        //rows check
-        for (auto r: rows) {
-            cout << "Rows: " << r << " " << flush;
-        }
-        cout << endl;
-
-        //cols  check
-        for (auto c: cols) {
-            cout << "Cols: " << c << " " << flush;
-        }
-        cout << endl;
-
-        // Distances check
-        for (auto i: Distances) {
-            cout << "D: ";
-            for (auto j : i) {
-                cout << j << " " << flush;
-            }
-            cout << endl;
-        }
-
-        // D_copy check
-        for (auto i: D_copy) {
-            cout << "D_copy: ";
-            for (auto j : i) {
-                cout << j << " " << flush;
-            }
-            cout << endl;
-        }
-        // <--------------All print checks---------------->
 
         set<int> usedRows;
         set<int> usedCols;
@@ -189,7 +145,6 @@ std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<
                     this->objects[t].second.second = inputCentroids[cols[i]].second;
                 }
             }
-//            this->objects[objectID] = inputCentroids[cols[i]];
             this->disappeared[objectID] = 0;
 
             usedRows.insert(rows[i]);
@@ -235,6 +190,5 @@ std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<
             }
         }
     }
-    cout << "<---------------------->" << endl;
     return this->objects;
 }
