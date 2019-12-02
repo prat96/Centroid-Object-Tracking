@@ -9,11 +9,10 @@ using namespace std;
 
 int main() {
     std::cout << "Hello, Tracker!" << std::endl;
-    int W = 300;
-    auto centroidTracker = new CentroidTracker(15);
+    auto centroidTracker = new CentroidTracker(20);
 
-    VideoCapture cap(0);
-//    VideoCapture cap("../../test.mp4");
+//    VideoCapture cap(0);
+    VideoCapture cap("../../test2.mp4");
     if (!cap.isOpened()) {
         cout << "Cannot open camera";
     }
@@ -25,7 +24,7 @@ int main() {
     auto net = dnn::readNetFromCaffe(modelTxt, modelBin);
 
     //make buffer for path tracking
-    vector<pair<int, int>> path_keeper;
+    map<int, vector<pair<int, int>>> path_keeper;
 
     cout << "Starting video stream" << endl;
     while (cap.isOpened()) {
@@ -67,21 +66,23 @@ int main() {
             cv::putText(cameraFrame, ID, Point(obj.second.first - 10, obj.second.second - 10),
                         FONT_HERSHEY_COMPLEX, 0.5, Scalar(0, 255, 0), 2);
 
-            if (path_keeper.size() > 100){
-                path_keeper.erase(path_keeper.begin());
+            if (path_keeper[obj.first].size() > 20) {
+                path_keeper[obj.first].erase(path_keeper[obj.first].begin());
             }
-            path_keeper.push_back(make_pair(obj.second.first, obj.second.second));
+            path_keeper[obj.first].push_back(make_pair(obj.second.first, obj.second.second));
 
         }
         //drawing the path
-        for (int i = 1; i < path_keeper.size(); i++) {
-            int thickness = int(sqrt(path_keeper.size() / float(i + 1) * 2.5));
-            cv::line(cameraFrame, Point(path_keeper[i - 1].first, path_keeper[i - 1].second),
-                     Point(path_keeper[i].first, path_keeper[i].second), Scalar(0, 0, 255), thickness);
+        for (auto obj: objects) {
+            for (int i = 1; i < path_keeper[obj.first].size(); i++) {
+                int thickness = int(sqrt(path_keeper.size() / float(i + 1) * 2.5));
+                cv::line(cameraFrame, Point(path_keeper[obj.first][i-1].first, path_keeper[obj.first][i - 1].second),
+                         Point(path_keeper[obj.first][i].first, path_keeper[obj.first][i].second), Scalar(0, 0, 255), thickness);
+            }
         }
 
-
         imshow("Detection", cameraFrame);
+        cout << "SIZE: " <<path_keeper.size() << endl;
         char c = (char) waitKey(1);
         if (c == 27)
             break;
