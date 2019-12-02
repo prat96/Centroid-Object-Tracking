@@ -26,6 +26,9 @@ public:
 
     // <ID, centroids>
     std::vector<std::pair<int, std::pair<int, int>>> objects;
+
+    //make buffer for path tracking
+    std::map<int, std::vector<std::pair<int, int>>> path_keeper;
 private:
     int maxDisappeared;
 

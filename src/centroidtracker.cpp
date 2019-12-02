@@ -28,12 +28,13 @@ void CentroidTracker::register_Object(int cX, int cY) {
 void CentroidTracker::deregister_Object(int objectID) {
     cout << "DeRegistered object: " << objectID << endl;
     if (!this->objects.empty()) {
-        for (int i=0; i < this->objects.size(); i++){
-            if(this->objects[i].first == objectID){
+        for (int i = 0; i < this->objects.size(); i++) {
+            if (this->objects[i].first == objectID) {
                 this->objects.erase(this->objects.begin() + i);
             }
         }
         this->disappeared.erase(objectID);
+        this->path_keeper.erase(objectID);
     }
 }
 
@@ -75,8 +76,8 @@ std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<
         }
     }
 
-    // otherwise, there are currently tracking objects so we need to try to match the
-    // input centroids to existing object centroids
+        // otherwise, there are currently tracking objects so we need to try to match the
+        // input centroids to existing object centroids
     else {
         vector<int> objectIDs;
         vector<pair<int, int>> objectCentroids;
@@ -139,8 +140,8 @@ std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<
             //otherwise, grab the object ID for the current row, set its new centroid,
             // and reset the disappeared counter
             int objectID = objectIDs[rows[i]];
-            for (int t=0; t < this->objects.size(); t++){
-                if(this->objects[t].first == objectID){
+            for (int t = 0; t < this->objects.size(); t++) {
+                if (this->objects[t].first == objectID) {
                     this->objects[t].second.first = inputCentroids[cols[i]].first;
                     this->objects[t].second.second = inputCentroids[cols[i]].second;
                 }
@@ -190,5 +191,17 @@ std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<
             }
         }
     }
+    //loading path tracking points
+    if (!objects.empty()) {
+        for (auto obj: objects) {
+
+            if (path_keeper[obj.first].size() > 30) {
+                path_keeper[obj.first].erase(path_keeper[obj.first].begin());
+            }
+            path_keeper[obj.first].push_back(make_pair(obj.second.first, obj.second.second));
+        }
+    }
+
+
     return this->objects;
 }

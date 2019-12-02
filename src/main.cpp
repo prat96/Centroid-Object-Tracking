@@ -23,9 +23,6 @@ int main() {
     cout << "Loading model.." << endl;
     auto net = dnn::readNetFromCaffe(modelTxt, modelBin);
 
-    //make buffer for path tracking
-    map<int, vector<pair<int, int>>> path_keeper;
-
     cout << "Starting video stream" << endl;
     while (cap.isOpened()) {
         Mat cameraFrame;
@@ -60,36 +57,29 @@ int main() {
 
         auto objects = centroidTracker->update(boxes);
 
-        //loading path points
         if (!objects.empty()) {
             for (auto obj: objects) {
                 circle(cameraFrame, Point(obj.second.first, obj.second.second), 4, Scalar(255, 0, 0), -1);
                 string ID = std::to_string(obj.first);
                 cv::putText(cameraFrame, ID, Point(obj.second.first - 10, obj.second.second - 10),
                             FONT_HERSHEY_COMPLEX, 0.5, Scalar(0, 255, 0), 2);
-
-                if (path_keeper[obj.first].size() > 20) {
-                    path_keeper[obj.first].erase(path_keeper[obj.first].begin());
-                }
-                path_keeper[obj.first].push_back(make_pair(obj.second.first, obj.second.second));
-
             }
 
             //drawing the path
             for (auto obj: objects) {
-                for (int i = 1; i < path_keeper[obj.first].size(); i++) {
-//                    int thickness = int(sqrt(path_keeper.size() / float(i + 1) * 2.5));
+                int k = 1;
+                for (int i = 1; i < centroidTracker->path_keeper[obj.first].size(); i++) {
+                    int thickness = int(sqrt(20 / float(k + 1) * 2.5));
                     cv::line(cameraFrame,
-                             Point(path_keeper[obj.first][i - 1].first, path_keeper[obj.first][i - 1].second),
-                             Point(path_keeper[obj.first][i].first, path_keeper[obj.first][i].second),
-                             Scalar(0, 0, 255), 2);
+                             Point(centroidTracker->path_keeper[obj.first][i - 1].first, centroidTracker->path_keeper[obj.first][i - 1].second),
+                             Point(centroidTracker->path_keeper[obj.first][i].first, centroidTracker->path_keeper[obj.first][i].second),
+                             Scalar(0, 0, 255), thickness);
+                    k += 1;
                 }
             }
-
         }
         imshow("Detection", cameraFrame);
-//        cout << "SIZE: " << path_keeper.size() << endl;
-        char c = (char) waitKey(1);
+        char c = (char) waitKey(15);
         if (c == 27)
             break;
     }
