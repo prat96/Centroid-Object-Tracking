@@ -32,6 +32,7 @@ private:
     int nextObjectID;
 
     static double calcDistance(double x1, double y1, double x2, double y2);
+
     // <ID, count>
     std::map<int, int> disappeared;
 };

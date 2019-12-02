@@ -24,6 +24,9 @@ int main() {
     cout << "Loading model.." << endl;
     auto net = dnn::readNetFromCaffe(modelTxt, modelBin);
 
+    //make buffer for path tracking
+    vector<pair<int, int>> path_keeper;
+
     cout << "Starting video stream" << endl;
     while (cap.isOpened()) {
         Mat cameraFrame;
@@ -63,7 +66,21 @@ int main() {
             string ID = std::to_string(obj.first);
             cv::putText(cameraFrame, ID, Point(obj.second.first - 10, obj.second.second - 10),
                         FONT_HERSHEY_COMPLEX, 0.5, Scalar(0, 255, 0), 2);
+
+            if (path_keeper.size() > 100){
+                path_keeper.erase(path_keeper.begin());
+            }
+            path_keeper.push_back(make_pair(obj.second.first, obj.second.second));
+
         }
+        //drawing the path
+        for (int i = 1; i < path_keeper.size(); i++) {
+            int thickness = int(sqrt(path_keeper.size() / float(i + 1) * 2.5));
+            cv::line(cameraFrame, Point(path_keeper[i - 1].first, path_keeper[i - 1].second),
+                     Point(path_keeper[i].first, path_keeper[i].second), Scalar(0, 0, 255), thickness);
+        }
+
+
         imshow("Detection", cameraFrame);
         char c = (char) waitKey(1);
         if (c == 27)
