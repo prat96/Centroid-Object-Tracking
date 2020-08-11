@@ -6,4 +6,5 @@ C++ implementation of the simple MOT from https://www.pyimagesearch.com/2018/07/
 - mkdir build
 - cd build
 - cmake ..
+- make 
 - ./TRACKER
