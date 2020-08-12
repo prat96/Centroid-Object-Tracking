@@ -25,19 +25,6 @@ void CentroidTracker::register_Object(int cX, int cY) {
     this->nextObjectID += 1;
 }
 
-void CentroidTracker::deregister_Object(int objectID) {
-    cout << "DeRegistered object: " << objectID << endl;
-    if (!this->objects.empty()) {
-        for (int i = 0; i < this->objects.size(); i++) {
-            if (this->objects[i].first == objectID) {
-                this->objects.erase(this->objects.begin() + i);
-            }
-        }
-        this->disappeared.erase(objectID);
-        this->path_keeper.erase(objectID);
-    }
-}
-
 vector<float>::size_type findMin(const vector<float> &v, vector<float>::size_type pos = 0) {
     if (v.size() <= pos) return (v.size());
     vector<float>::size_type min = pos;
