@@ -36,13 +36,19 @@ vector<float>::size_type findMin(const vector<float> &v, vector<float>::size_typ
 
 std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<vector<int>> boxes) {
     if (boxes.empty()) {
-        if (!this->disappeared.empty()) {
-            for (auto elem : this->disappeared) {
-                this->disappeared[elem.first]++;
+        auto it = this->disappeared.begin();
+        while (it != this->disappeared.end()) {
+            it->second++;
+            if (it->second > this->maxDisappeared) {
+                this->objects.erase(remove_if(this->objects.begin(), this->objects.end(), [it](auto &elem) {
+                    return elem.first == it->first;
+                }), this->objects.end());
 
-                if (elem.second > this->maxDisappeared) {
-                    this->deregister_Object(elem.first);
-                }
+                this->path_keeper.erase(it->first);
+
+                it = this->disappeared.erase(it);
+            } else {
+                ++it;
             }
         }
         return this->objects;
