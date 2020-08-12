@@ -175,7 +175,13 @@ std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<
                 this->disappeared[objectID] += 1;
 
                 if (this->disappeared[objectID] > this->maxDisappeared) {
-                    this->deregister_Object(objectID);
+                    this->objects.erase(remove_if(this->objects.begin(), this->objects.end(), [objectID](auto &elem) {
+                        return elem.first == objectID;
+                    }), this->objects.end());
+
+                    this->path_keeper.erase(objectID);
+
+                    this->disappeared.erase(objectID);
                 }
             }
         } else {
