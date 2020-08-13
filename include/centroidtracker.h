@@ -20,8 +20,6 @@ public:
 
     void register_Object(int cX, int cY);
 
-    void deregister_Object(int objectID);
-
     std::vector<std::pair<int, std::pair<int, int>>> update(std::vector<std::vector<int>> boxes);
 
     // <ID, centroids>

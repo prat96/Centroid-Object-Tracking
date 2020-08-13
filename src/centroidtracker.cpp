@@ -25,19 +25,6 @@ void CentroidTracker::register_Object(int cX, int cY) {
     this->nextObjectID += 1;
 }
 
-void CentroidTracker::deregister_Object(int objectID) {
-    cout << "DeRegistered object: " << objectID << endl;
-    if (!this->objects.empty()) {
-        for (int i = 0; i < this->objects.size(); i++) {
-            if (this->objects[i].first == objectID) {
-                this->objects.erase(this->objects.begin() + i);
-            }
-        }
-        this->disappeared.erase(objectID);
-        this->path_keeper.erase(objectID);
-    }
-}
-
 vector<float>::size_type findMin(const vector<float> &v, vector<float>::size_type pos = 0) {
     if (v.size() <= pos) return (v.size());
     vector<float>::size_type min = pos;
@@ -49,13 +36,19 @@ vector<float>::size_type findMin(const vector<float> &v, vector<float>::size_typ
 
 std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<vector<int>> boxes) {
     if (boxes.empty()) {
-        if (!this->disappeared.empty()) {
-            for (auto elem : this->disappeared) {
-                this->disappeared[elem.first]++;
+        auto it = this->disappeared.begin();
+        while (it != this->disappeared.end()) {
+            it->second++;
+            if (it->second > this->maxDisappeared) {
+                this->objects.erase(remove_if(this->objects.begin(), this->objects.end(), [it](auto &elem) {
+                    return elem.first == it->first;
+                }), this->objects.end());
 
-                if (elem.second > this->maxDisappeared) {
-                    this->deregister_Object(elem.first);
-                }
+                this->path_keeper.erase(it->first);
+
+                it = this->disappeared.erase(it);
+            } else {
+                ++it;
             }
         }
         return this->objects;
@@ -182,7 +175,13 @@ std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<
                 this->disappeared[objectID] += 1;
 
                 if (this->disappeared[objectID] > this->maxDisappeared) {
-                    this->deregister_Object(objectID);
+                    this->objects.erase(remove_if(this->objects.begin(), this->objects.end(), [objectID](auto &elem) {
+                        return elem.first == objectID;
+                    }), this->objects.end());
+
+                    this->path_keeper.erase(objectID);
+
+                    this->disappeared.erase(objectID);
                 }
             }
         } else {
