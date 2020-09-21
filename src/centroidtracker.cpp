@@ -2,6 +2,7 @@
 Created by pratheek on 2019-11-27.
 */
 #include "centroidtracker.h"
+#include <iterator>
 
 using namespace std;
 
