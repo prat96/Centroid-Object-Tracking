@@ -6,9 +6,13 @@ Created by pratheek on 2019-11-27.
 
 using namespace std;
 
-CentroidTracker::CentroidTracker(int maxDisappeared) {
+CentroidTracker::CentroidTracker(int maxDisappeared, int maxDistance) {
     this->nextObjectID = 0;
     this->maxDisappeared = maxDisappeared;
+    //store the maximum distance between centroids to associate
+	//an object -- if the distance is larger than this maximum
+	//distance we'll start to mark the object as "disappeared"
+    this->maxDistance = maxDistance;
 }
 
 double CentroidTracker::calcDistance(double x1, double y1, double x2, double y2) {
@@ -131,6 +135,13 @@ std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<
         for (int i = 0; i < rows.size(); i++) {
             //if we have already examined either the row or column value before, ignore it
             if (usedRows.count(rows[i]) || usedCols.count(cols[i])) { continue; }
+
+            // if the distance between centroids is greater than
+			// the maximum distance, do not associate the two
+			// centroids to the same object
+            if (Distances[usedRows.count(rows[i]), usedCols.count(cols[i])] > this->maxDistance) { continue; }
+
+
             //otherwise, grab the object ID for the current row, set its new centroid,
             // and reset the disappeared counter
             int objectID = objectIDs[rows[i]];
