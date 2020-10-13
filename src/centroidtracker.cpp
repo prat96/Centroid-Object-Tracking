@@ -6,9 +6,10 @@ Created by pratheek on 2019-11-27.
 
 using namespace std;
 
-CentroidTracker::CentroidTracker(int maxDisappeared) {
+CentroidTracker::CentroidTracker(int maxDisappeared, int maxDistance) {
     this->nextObjectID = 0;
     this->maxDisappeared = maxDisappeared;
+    this->maxDistance = maxDistance;
 }
 
 double CentroidTracker::calcDistance(double x1, double y1, double x2, double y2) {
