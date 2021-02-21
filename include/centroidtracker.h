@@ -16,7 +16,7 @@ Created by pratheek on 2019-11-27.
 
 class CentroidTracker {
 public:
-    explicit CentroidTracker(int maxDisappeared);
+    explicit CentroidTracker(int maxDisappeared, int maxDistance);
 
     void register_Object(int cX, int cY);
 
@@ -29,7 +29,7 @@ public:
     std::map<int, std::vector<std::pair<int, int>>> path_keeper;
 private:
     int maxDisappeared;
-
+    int maxDistance;
     int nextObjectID;
 
     static double calcDistance(double x1, double y1, double x2, double y2);
