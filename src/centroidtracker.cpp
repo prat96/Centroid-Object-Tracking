@@ -82,9 +82,9 @@ std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<
 
 //        Calculate Distances
         vector<vector<float>> Distances;
-        for (int i = 0; i < objectCentroids.size(); ++i) {
+        for (int i = 0; i < objectCentroids.size(); i++) {
             vector<float> temp_D;
-            for (vector<vector<int>>::size_type j = 0; j < inputCentroids.size(); ++j) {
+            for (vector<vector<int>>::size_type j = 0; j < inputCentroids.size(); j++) {
                 double dist = calcDistance(objectCentroids[i].first, objectCentroids[i].second, inputCentroids[j].first,
                                            inputCentroids[j].second);
 
