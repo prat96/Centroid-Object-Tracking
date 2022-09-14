@@ -35,6 +35,12 @@ vector<float>::size_type findMin(const vector<float> &v, vector<float>::size_typ
     return (min);
 }
 
+bool sortbyfirst(const pair<int,int> &a,
+            const pair<int,int> &b)
+{
+    return (a.first < b.first);
+}
+
 std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<vector<int>> boxes) {
     if (boxes.empty()) {
         auto it = this->disappeared.begin();
@@ -82,9 +88,9 @@ std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<
 
 //        Calculate Distances
         vector<vector<float>> Distances;
-        for (int i = 0; i < objectCentroids.size(); ++i) {
+        for (int i = 0; i < objectCentroids.size(); i++) {
             vector<float> temp_D;
-            for (vector<vector<int>>::size_type j = 0; j < inputCentroids.size(); ++j) {
+            for (vector<vector<int>>::size_type j = 0; j < inputCentroids.size(); j++) {
                 double dist = calcDistance(objectCentroids[i].first, objectCentroids[i].second, inputCentroids[j].first,
                                            inputCentroids[j].second);
 
@@ -94,14 +100,9 @@ std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<
         }
 
         // load rows and cols
+        vector<int> tmp_cols;
         vector<int> cols;
         vector<int> rows;
-
-        //find indices for cols
-        for (auto v: Distances) {
-            auto temp = findMin(v);
-            cols.push_back(temp);
-        }
 
         //rows calculation
         //sort each mat row for rows calculation
@@ -110,7 +111,6 @@ std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<
             sort(v.begin(), v.end());
             D_copy.push_back(v);
         }
-
         // use cols calc to find rows
         // slice first elem of each column
         vector<pair<float, int>> temp_rows;
@@ -119,11 +119,19 @@ std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<
             temp_rows.push_back(make_pair(i[0], k));
             k++;
         }
+        sort(temp_rows.begin(), temp_rows.end(), sortbyfirst);
         //print sorted indices of temp_rows
         for (auto const &x : temp_rows) {
             rows.push_back(x.second);
         }
-
+        //find indices for cols
+        for (auto v: Distances) {
+            auto temp = findMin(v);
+            tmp_cols.push_back(temp);
+        }
+        for (int i=0;i<rows.size();i++){
+            cols.push_back(tmp_cols[rows[i]]);
+        }
         set<int> usedRows;
         set<int> usedCols;
 
