@@ -35,7 +35,7 @@ vector<float>::size_type findMin(const vector<float> &v, vector<float>::size_typ
     return (min);
 }
 
-bool sortbysec(const pair<int,int> &a,
+bool sortbyfirst(const pair<int,int> &a,
             const pair<int,int> &b)
 {
     return (a.first < b.first);
@@ -119,7 +119,7 @@ std::vector<std::pair<int, std::pair<int, int>>> CentroidTracker::update(vector<
             temp_rows.push_back(make_pair(i[0], k));
             k++;
         }
-        sort(temp_rows.begin(), temp_rows.end(), sortbysec);
+        sort(temp_rows.begin(), temp_rows.end(), sortbyfirst);
         //print sorted indices of temp_rows
         for (auto const &x : temp_rows) {
             rows.push_back(x.second);
